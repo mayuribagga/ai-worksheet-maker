@@ -17,7 +17,6 @@ export default function LoginPage({ searchParams }: { searchParams: StatusSearch
         action={login}
         submitLabel="Sign in"
         pendingLabel="Signing in…"
-        passwordAutoComplete="current-password"
       />
 
       <p className="text-sm text-zinc-600 dark:text-zinc-400">

@@ -17,7 +17,7 @@ export default function SignupPage({ searchParams }: { searchParams: StatusSearc
         action={signup}
         submitLabel="Create account"
         pendingLabel="Creating account…"
-        passwordAutoComplete="new-password"
+        isNewPassword
       />
 
       <p className="text-sm text-zinc-600 dark:text-zinc-400">
