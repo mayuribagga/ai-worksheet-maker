@@ -1,9 +1,7 @@
 -- Profiles and worksheets.
 -- Run in the Supabase dashboard: SQL Editor → New query → paste → Run.
-
--- ---------------------------------------------------------------------------
 -- Profiles: one row per user, created automatically when they sign up.
--- ---------------------------------------------------------------------------
+
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
