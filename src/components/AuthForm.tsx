@@ -16,16 +16,16 @@ type AuthFormProps = {
 export function AuthForm({ action, submitLabel, pendingLabel, isNewPassword = false }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const inputClass =
-    "rounded-md border border-zinc-300 px-3 py-2 text-base font-normal dark:border-zinc-700 dark:bg-zinc-900";
+    "input";
 
   return (
     <form action={action} className="flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-sm font-medium">
+      <label className="flex flex-col gap-1 text-sm text-ink">
         Email
         <input name="email" type="email" autoComplete="email" required className={inputClass} />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm font-medium">
+      <label className="flex flex-col gap-1 text-sm text-ink">
         Password
         <input
           name="password"
@@ -45,7 +45,7 @@ export function AuthForm({ action, submitLabel, pendingLabel, isNewPassword = fa
             return (
               <li
                 key={rule.id}
-                className={met ? "text-green-700 dark:text-green-400" : "text-zinc-500"}
+                className={met ? "text-green-700" : "text-muted"}
               >
                 {met ? "✓" : "○"} {rule.label}
               </li>

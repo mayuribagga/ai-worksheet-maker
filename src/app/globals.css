@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Dark mode is off for now: the brand is designed for a light background.
+   "dark:" classes only apply inside an element with class="dark". */
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Mayuri Teaches brand, taken from the logo. */
+@theme {
+  --color-ink: #1800ad; /* deep indigo: logo arch and wordmark */
+  --color-royal: #5232ef; /* bookshelf */
+  --color-violet: #8c52ff; /* first book */
+  --color-orchid: #cb6ce6; /* second book */
+  --color-lilac: #e2a9f1; /* third book */
+  --color-blush: #f6b4ef; /* sparkles */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-paper: #fbf8ff; /* page background */
+  --color-text: #241a4f; /* body text */
+  --color-muted: #6a6191; /* secondary text */
+  --color-line: #e6dcfa; /* borders and dividers */
+
+  --font-sans: var(--font-sniglet), ui-rounded, ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-text);
+}
+
+/* Shared styles so every page looks the same. */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-ink px-5 py-2 font-display font-medium text-white transition-colors hover:bg-royal disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border-2 border-lilac bg-white px-4 py-1.5 font-display text-sm font-medium text-ink transition-colors hover:border-violet hover:bg-paper disabled:opacity-50;
+  }
+  .input {
+    @apply rounded-xl border-2 border-line bg-white px-3 py-2 text-base text-text outline-none focus:border-violet;
+  }
+  .link {
+    @apply text-ink underline decoration-lilac decoration-2 underline-offset-4 hover:decoration-violet;
+  }
+  .page-title {
+    @apply font-display text-3xl font-black tracking-tight text-ink;
+  }
+  .card {
+    @apply rounded-3xl border-2 border-line bg-white;
+  }
+  .alert {
+    @apply rounded-xl px-3 py-2 text-sm;
+  }
+  .alert-error {
+    @apply bg-red-50 text-red-700;
+  }
+  .alert-success {
+    @apply bg-violet/10 text-ink;
+  }
+  .alert-warning {
+    @apply bg-amber-50 text-amber-800;
+  }
+}
+
+/* Printed worksheets: Letter paper with even margins, and keep brand colours. */
+@page {
+  size: letter;
+  margin: 0.6in;
+}
+
+@media print {
+  body {
+    background: white;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 }

@@ -15,6 +15,7 @@ export type GenerateState = {
   label?: string;
   savedId?: string;
   saveFailed?: boolean;
+  remainingToday?: number;
   error?: string;
 };
 
@@ -41,6 +42,17 @@ export async function generateWorksheet(
 
   if (!process.env.ANTHROPIC_API_KEY) {
     return { error: "ANTHROPIC_API_KEY is missing from .env.local." };
+  }
+
+  // Count this generation against the user's daily limit. The database does
+  // the counting so the limit can't be bypassed from the browser.
+  const { data: remainingToday, error: limitError } = await supabase.rpc("use_generation");
+  if (limitError) {
+    console.error("Checking the daily limit failed:", limitError);
+    return { error: "Couldn't check your daily worksheet limit. Please try again." };
+  }
+  if (remainingToday < 0) {
+    return { error: "You've reached today's worksheet limit. You can make more tomorrow." };
   }
 
   const anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY
@@ -107,6 +119,7 @@ export async function generateWorksheet(
           label,
           savedId: saved?.id,
           saveFailed: Boolean(saveError),
+          remainingToday,
         };
       }
 

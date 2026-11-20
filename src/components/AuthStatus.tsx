@@ -2,7 +2,7 @@ import Link from "next/link";
 import { signOut } from "@/app/login/actions";
 import { createClient } from "@/lib/supabase/server";
 
-// Shows who's signed in with a sign-out button, or a sign-in link.
+// Header links: sign in / create account, or the signed-in user's links.
 export async function AuthStatus() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
@@ -10,32 +10,41 @@ export async function AuthStatus() {
 
   if (!email) {
     return (
-      <Link
-        href="/login"
-        className="w-fit rounded-md bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
-        Sign in or create an account
-      </Link>
+      <nav className="flex items-center gap-3">
+        <Link href="/login" className="link text-sm">
+          Sign in
+        </Link>
+        <Link href="/signup" className="btn-primary text-sm">
+          Create account
+        </Link>
+      </nav>
     );
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <Link
-        href="/generate"
-        className="rounded-md bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
+    <nav className="flex flex-wrap items-center gap-3">
+      <Link href="/generate" className="btn-primary text-sm">
         Make a worksheet
       </Link>
-      <Link href="/worksheets" className="text-sm font-medium underline">
+      <Link href="/worksheets" className="link text-sm">
         My worksheets
       </Link>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">Signed in as {email}</p>
-      <form action={signOut}>
-        <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800">
-          Sign out
-        </button>
-      </form>
-    </div>
+      <div className="flex items-center gap-2 border-l-2 border-line pl-3">
+        {/* Shows who's signed in: the first letter in a circle, plus the email. */}
+        <span
+          aria-hidden
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lilac font-display text-sm font-bold uppercase text-ink"
+        >
+          {email[0]}
+        </span>
+        <span className="hidden max-w-48 truncate text-sm text-muted sm:inline" title={email}>
+          <span className="sr-only">Signed in as </span>
+          {email}
+        </span>
+        <form action={signOut}>
+          <button className="btn-secondary">Sign out</button>
+        </form>
+      </div>
+    </nav>
   );
 }

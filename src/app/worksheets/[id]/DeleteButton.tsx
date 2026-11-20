@@ -15,7 +15,7 @@ export function DeleteButton() {
           event.preventDefault();
         }
       }}
-      className="w-fit rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+      className="inline-flex w-fit items-center rounded-full border-2 border-red-200 bg-white px-4 py-1.5 font-display text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
     >
       {pending ? "Deleting…" : "Delete worksheet"}
     </button>

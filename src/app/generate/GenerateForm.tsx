@@ -14,8 +14,7 @@ import { WorksheetView } from "@/components/WorksheetView";
 
 const initialState: GenerateState = {};
 
-const selectClass =
-  "rounded-md border border-zinc-300 px-3 py-2 text-base font-normal dark:border-zinc-700 dark:bg-zinc-900";
+const selectClass = "input";
 
 export function GenerateForm() {
   const [state, formAction, pending] = useActionState(generateWorksheet, initialState);
@@ -41,9 +40,9 @@ export function GenerateForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <form action={formAction} className="flex flex-col gap-4">
+      <form action={formAction} className="card flex flex-col gap-4 p-6">
         <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
-          <label className="flex flex-col gap-1 text-sm font-medium">
+          <label className="flex flex-col gap-1 text-sm text-ink">
             Grade
             <select
               name="grade"
@@ -59,7 +58,7 @@ export function GenerateForm() {
             </select>
           </label>
 
-          <label className="flex flex-col gap-1 text-sm font-medium">
+          <label className="flex flex-col gap-1 text-sm text-ink">
             Subject
             <select
               name="subject"
@@ -76,7 +75,7 @@ export function GenerateForm() {
           </label>
         </div>
 
-        <label className="flex flex-col gap-1 text-sm font-medium">
+        <label className="flex flex-col gap-1 text-sm text-ink">
           Topic
           <select
             name="topic"
@@ -99,29 +98,36 @@ export function GenerateForm() {
         <button
           type="submit"
           disabled={pending || !topicId}
-          className="w-fit rounded-md bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="btn-primary w-fit"
         >
           {pending ? "Generating…" : "Generate worksheet"}
         </button>
+        {state.remainingToday !== undefined && (
+          <p className="text-sm text-muted">
+            {state.remainingToday === 1
+              ? "1 worksheet left today."
+              : `${state.remainingToday} worksheets left today.`}
+          </p>
+        )}
       </form>
 
       {state.error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p className="alert alert-error">
           {state.error}
         </p>
       )}
 
       {state.savedId && (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950 dark:text-green-300">
+        <p className="alert alert-success">
           Saved to{" "}
-          <Link href="/worksheets" className="font-medium underline">
+          <Link href="/worksheets" className="link">
             My worksheets
           </Link>
           .
         </p>
       )}
       {state.saveFailed && (
-        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+        <p className="alert alert-warning">
           This worksheet couldn&apos;t be saved, but you can still use it below.
         </p>
       )}

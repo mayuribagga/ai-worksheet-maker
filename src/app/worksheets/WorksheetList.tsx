@@ -13,8 +13,8 @@ export async function WorksheetList() {
   const { data: auth } = await supabase.auth.getClaims();
   if (!auth?.claims) {
     return (
-      <p className="text-zinc-600 dark:text-zinc-400">
-        <Link href="/login" className="font-medium underline">
+      <p className="text-muted">
+        <Link href="/login" className="link">
           Sign in
         </Link>{" "}
         to see your worksheets.
@@ -31,7 +31,7 @@ export async function WorksheetList() {
   if (error) {
     console.error("Loading worksheets failed:", error);
     return (
-      <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+      <p className="alert alert-error">
         Couldn&apos;t load your worksheets. Please try again.
       </p>
     );
@@ -39,9 +39,9 @@ export async function WorksheetList() {
 
   if (worksheets.length === 0) {
     return (
-      <p className="text-zinc-600 dark:text-zinc-400">
+      <p className="text-muted">
         No worksheets yet.{" "}
-        <Link href="/generate" className="font-medium underline">
+        <Link href="/generate" className="link">
           Make your first one
         </Link>
         .
@@ -50,13 +50,13 @@ export async function WorksheetList() {
   }
 
   return (
-    <ul className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
+    <ul className="flex flex-col divide-y divide-line">
       {worksheets.map((worksheet) => (
         <li key={worksheet.id} className="py-3">
-          <Link href={`/worksheets/${worksheet.id}`} className="font-medium hover:underline">
+          <Link href={`/worksheets/${worksheet.id}`} className="font-display text-lg font-bold text-ink hover:underline">
             {worksheet.title}
           </Link>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted">
             {topicLabel(worksheet.grade, worksheet.subject, worksheet.topic_id)} ·{" "}
             {dateFormat.format(new Date(worksheet.created_at))}
           </p>
