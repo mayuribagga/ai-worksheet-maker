@@ -3,11 +3,20 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { findTopic, subjectNames, type SubjectId } from "@/data/curriculum";
 import { createClient } from "@/lib/supabase/server";
+import {
+  parseWorksheet,
+  QUESTION_COUNT,
+  worksheetJsonSchema,
+  type Worksheet,
+} from "@/lib/worksheet";
 
 export type GenerateState = {
-  worksheet?: string;
+  worksheet?: Worksheet;
+  label?: string;
   error?: string;
 };
+
+const MAX_ATTEMPTS = 2;
 
 export async function generateWorksheet(
   _previousState: GenerateState,
@@ -33,35 +42,53 @@ export async function generateWorksheet(
   }
 
   const anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY
+  const label = `Grade ${grade} · ${subjectNames[subject]} · ${topic.name}`;
+
+  const request =
+    `Write a Grade ${grade} ${subjectNames[subject]} worksheet on "${topic.name}" ` +
+    `(strand: ${topic.strand}) with ${QUESTION_COUNT} multiple choice questions. ` +
+    (subject === "french"
+      ? "Write the title, instructions, questions and choices in French at a Core French level " +
+        "for this grade. Write the explanations in English. "
+      : "") +
+    "Each question has exactly one correct choice. Save it with the save_worksheet tool.";
 
   try {
-    const message = await anthropic.messages.create({
-      model: process.env.WORKSHEET_MODEL ?? "claude-haiku-5-5",
-      max_tokens: 2000,
-      system:
-        "You write worksheets for Ontario elementary students that follow the Ontario curriculum. " +
-        "Use age-appropriate language for the grade, Canadian spelling and metric units.",
-      messages: [
-        {
-          role: "user",
-          content:
-            `Write a Grade ${grade} ${subjectNames[subject]} worksheet on "${topic.name}" ` +
-            `(strand: ${topic.strand}). ` +
-            (subject === "french"
-              ? "Write the questions in French at a Core French level for this grade. "
-              : "") +
-            "Include a title, one line of instructions, 5 multiple choice questions " +
-            "with four options each, and an answer key at the end. Plain text only, no Markdown.",
-        },
-      ],
-    });
+    let problem = "";
 
-    const worksheet = message.content
-      .filter((block) => block.type === "text")
-      .map((block) => block.text)
-      .join("\n");
+    // Ask Claude, check the reply, and try again once if it's not usable.
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const message = await anthropic.messages.create({
+        model: process.env.WORKSHEET_MODEL ?? "claude-haiku-5-5",
+        max_tokens: 3000,
+        system:
+          "You write worksheets for Ontario elementary students that follow the Ontario curriculum. " +
+          "Use age-appropriate language for the grade, Canadian spelling and metric units. " +
+          "Double-check that every marked answer is correct.",
+        tools: [
+          {
+            name: "save_worksheet",
+            description: "Save the finished worksheet.",
+            input_schema: worksheetJsonSchema() as Anthropic.Tool.InputSchema,
+          },
+        ],
+        // Forces Claude to reply by calling the tool, so we always get structured data.
+        tool_choice: { type: "tool", name: "save_worksheet" },
+        messages: [{ role: "user", content: request }],
+      });
 
-    return { worksheet };
+      const toolUse = message.content.find((block) => block.type === "tool_use");
+      const result = parseWorksheet(toolUse?.input);
+      if ("worksheet" in result) {
+        return { worksheet: result.worksheet, label };
+      }
+
+      problem = result.problem;
+      console.warn(`Worksheet attempt ${attempt} was invalid:`, problem);
+    }
+
+    console.error("Worksheet still invalid after retrying:", problem);
+    return { error: "Claude's worksheet didn't come out right. Please try again." };
   } catch (error) {
     console.error("Worksheet generation failed:", error);
 

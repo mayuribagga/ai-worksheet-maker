@@ -9,6 +9,7 @@ import {
   type SubjectId,
 } from "@/data/curriculum";
 import { generateWorksheet, type GenerateState } from "./actions";
+import { WorksheetView } from "./WorksheetView";
 
 const initialState: GenerateState = {};
 
@@ -109,10 +110,9 @@ export function GenerateForm() {
         </p>
       )}
 
-      {state.worksheet && (
-        <pre className="whitespace-pre-wrap rounded-md border border-zinc-200 p-6 font-sans text-sm leading-relaxed dark:border-zinc-800">
-          {state.worksheet}
-        </pre>
+      {state.worksheet && state.label && (
+        // A new key for each worksheet resets the "show answer key" toggle.
+        <WorksheetView key={state.worksheet.title} worksheet={state.worksheet} label={state.label} />
       )}
     </div>
   );
