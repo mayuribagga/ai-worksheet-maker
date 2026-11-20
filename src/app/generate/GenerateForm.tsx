@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import {
   grades,
@@ -9,7 +10,7 @@ import {
   type SubjectId,
 } from "@/data/curriculum";
 import { generateWorksheet, type GenerateState } from "./actions";
-import { WorksheetView } from "./WorksheetView";
+import { WorksheetView } from "@/components/WorksheetView";
 
 const initialState: GenerateState = {};
 
@@ -107,6 +108,21 @@ export function GenerateForm() {
       {state.error && (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
           {state.error}
+        </p>
+      )}
+
+      {state.savedId && (
+        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950 dark:text-green-300">
+          Saved to{" "}
+          <Link href="/worksheets" className="font-medium underline">
+            My worksheets
+          </Link>
+          .
+        </p>
+      )}
+      {state.saveFailed && (
+        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+          This worksheet couldn&apos;t be saved, but you can still use it below.
         </p>
       )}
 

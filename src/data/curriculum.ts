@@ -227,3 +227,10 @@ export function topicsFor(grade: number, subject: SubjectId): Topic[] {
 export function findTopic(grade: number, subject: string, topicId: string): Topic | undefined {
   return topicsFor(grade, subject as SubjectId).find((topic) => topic.id === topicId);
 }
+
+// A readable description like "Grade 4 · Mathematics · Fractions".
+export function topicLabel(grade: number, subject: string, topicId: string): string {
+  const subjectName = subjectNames[subject as SubjectId] ?? subject;
+  const topicName = findTopic(grade, subject, topicId)?.name ?? topicId;
+  return `Grade ${grade} · ${subjectName} · ${topicName}`;
+}

@@ -27,6 +27,9 @@ export async function AuthStatus() {
       >
         Make a worksheet
       </Link>
+      <Link href="/worksheets" className="text-sm font-medium underline">
+        My worksheets
+      </Link>
       <p className="text-sm text-zinc-600 dark:text-zinc-400">Signed in as {email}</p>
       <form action={signOut}>
         <button className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800">

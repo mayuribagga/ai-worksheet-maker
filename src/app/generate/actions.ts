@@ -1,7 +1,7 @@
 "use server";
 
 import Anthropic from "@anthropic-ai/sdk";
-import { findTopic, subjectNames, type SubjectId } from "@/data/curriculum";
+import { findTopic, subjectNames, topicLabel, type SubjectId } from "@/data/curriculum";
 import { createClient } from "@/lib/supabase/server";
 import {
   parseWorksheet,
@@ -13,6 +13,8 @@ import {
 export type GenerateState = {
   worksheet?: Worksheet;
   label?: string;
+  savedId?: string;
+  saveFailed?: boolean;
   error?: string;
 };
 
@@ -42,7 +44,7 @@ export async function generateWorksheet(
   }
 
   const anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY
-  const label = `Grade ${grade} · ${subjectNames[subject]} · ${topic.name}`;
+  const label = topicLabel(grade, subject, topic.id);
 
   const request =
     `Write a Grade ${grade} ${subjectNames[subject]} worksheet on "${topic.name}" ` +
@@ -80,7 +82,32 @@ export async function generateWorksheet(
       const toolUse = message.content.find((block) => block.type === "tool_use");
       const result = parseWorksheet(toolUse?.input);
       if ("worksheet" in result) {
-        return { worksheet: result.worksheet, label };
+        // Save it to the signed-in user's worksheets. user_id is filled in by
+        // the database, and row-level security makes sure it's theirs.
+        const { data: saved, error: saveError } = await supabase
+          .from("worksheets")
+          .insert({
+            title: result.worksheet.title,
+            grade,
+            subject,
+            topic_id: topic.id,
+            style_id: "multiple-choice",
+            content: result.worksheet,
+          })
+          .select("id")
+          .single();
+
+        if (saveError) {
+          // Still show the worksheet, just let the user know it wasn't saved.
+          console.error("Saving the worksheet failed:", saveError);
+        }
+
+        return {
+          worksheet: result.worksheet,
+          label,
+          savedId: saved?.id,
+          saveFailed: Boolean(saveError),
+        };
       }
 
       problem = result.problem;
