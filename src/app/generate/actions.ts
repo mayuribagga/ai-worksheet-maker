@@ -1,6 +1,7 @@
 "use server";
 
 import Anthropic from "@anthropic-ai/sdk";
+import { findTopic, subjectNames, type SubjectId } from "@/data/curriculum";
 import { createClient } from "@/lib/supabase/server";
 
 export type GenerateState = {
@@ -8,19 +9,23 @@ export type GenerateState = {
   error?: string;
 };
 
-// Hardcoded for now. The topic and style pickers come later.
-const topic = {
-  grade: 4,
-  subject: "Math",
-  name: "Fractions",
-};
-
-export async function generateWorksheet(): Promise<GenerateState> {
+export async function generateWorksheet(
+  _previousState: GenerateState,
+  formData: FormData,
+): Promise<GenerateState> {
   // Only signed-in users can generate, since every call costs money.
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   if (!data?.claims) {
     return { error: "Please sign in to generate a worksheet." };
+  }
+
+  // Check the choice against our curriculum data, since form values can be faked.
+  const grade = Number(formData.get("grade"));
+  const subject = String(formData.get("subject") ?? "") as SubjectId;
+  const topic = findTopic(grade, subject, String(formData.get("topic") ?? ""));
+  if (!topic) {
+    return { error: "Please choose a grade, subject and topic." };
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
@@ -40,7 +45,11 @@ export async function generateWorksheet(): Promise<GenerateState> {
         {
           role: "user",
           content:
-            `Write a Grade ${topic.grade} ${topic.subject} worksheet on ${topic.name}. ` +
+            `Write a Grade ${grade} ${subjectNames[subject]} worksheet on "${topic.name}" ` +
+            `(strand: ${topic.strand}). ` +
+            (subject === "french"
+              ? "Write the questions in French at a Core French level for this grade. "
+              : "") +
             "Include a title, one line of instructions, 5 multiple choice questions " +
             "with four options each, and an answer key at the end. Plain text only, no Markdown.",
         },
