@@ -38,7 +38,7 @@ async function PrintableSavedWorksheet({ params }: { params: Promise<{ id: strin
           <PrintButton />
         </div>
       </div>
-      <PrintableWorksheet worksheet={result.worksheet} label={result.label} />
+      <PrintableWorksheet worksheet={result.worksheet} meta={result.meta} />
     </>
   );
 }

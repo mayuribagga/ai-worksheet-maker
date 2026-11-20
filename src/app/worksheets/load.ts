@@ -1,9 +1,9 @@
-import { topicLabel } from "@/data/curriculum";
+import type { SubjectId } from "@/data/curriculum";
 import { createClient } from "@/lib/supabase/server";
-import { parseWorksheet, type Worksheet } from "@/lib/worksheet";
+import { parseWorksheet, type Worksheet, type WorksheetMeta } from "@/lib/worksheet";
 
 export type LoadedWorksheet =
-  | { status: "ok"; id: string; worksheet: Worksheet; label: string }
+  | { status: "ok"; id: string; worksheet: Worksheet; meta: WorksheetMeta }
   | { status: "not-found" }
   | { status: "invalid" };
 
@@ -32,6 +32,6 @@ export async function loadWorksheet(id: string): Promise<LoadedWorksheet> {
     status: "ok",
     id: row.id,
     worksheet: parsed.worksheet,
-    label: topicLabel(row.grade, row.subject, row.topic_id),
+    meta: { grade: row.grade, subject: row.subject as SubjectId, topicId: row.topic_id },
   };
 }

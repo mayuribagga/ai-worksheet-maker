@@ -228,9 +228,43 @@ export function findTopic(grade: number, subject: string, topicId: string): Topi
   return topicsFor(grade, subject as SubjectId).find((topic) => topic.id === topicId);
 }
 
-// A readable description like "Grade 4 · Mathematics · Fractions".
-export function topicLabel(grade: number, subject: string, topicId: string): string {
-  const subjectName = subjectNames[subject as SubjectId] ?? subject;
-  const topicName = findTopic(grade, subject, topicId)?.name ?? topicId;
-  return `Grade ${grade} · ${subjectName} · ${topicName}`;
+
+export type TopicDescription = {
+  gradeLabel: string;
+  subjectName: string;
+  topicName: string;
+  strand?: string;
+};
+
+// The parts of a topic's description, for showing as separate labels.
+export function describeTopic(grade: number, subject: string, topicId: string): TopicDescription {
+  const topic = findTopic(grade, subject, topicId);
+  return {
+    gradeLabel: grade === 0 ? "Kindergarten" : `Grade ${grade}`,
+    subjectName: subjectNames[subject as SubjectId] ?? subject,
+    topicName: topic?.name ?? topicId,
+    strand: topic?.strand,
+  };
+}
+
+export type SubjectSummary = {
+  subject: SubjectId;
+  firstGrade: number;
+  lastGrade: number;
+  topicCount: number;
+};
+
+// For each subject: which grades it covers and how many topics it has.
+export function subjectSummaries(): SubjectSummary[] {
+  const order: SubjectId[] = ["math", "french", "science", "social-studies", "history-geography"];
+  return order.map((subject) => {
+    const entries = curriculum.filter((entry) => entry.subject === subject);
+    const gradeList = entries.map((entry) => entry.grade);
+    return {
+      subject,
+      firstGrade: Math.min(...gradeList),
+      lastGrade: Math.max(...gradeList),
+      topicCount: entries.reduce((sum, entry) => sum + entry.topics.length, 0),
+    };
+  });
 }

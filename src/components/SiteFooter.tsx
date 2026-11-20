@@ -1,14 +1,32 @@
+import Image from "next/image";
+import Link from "next/link";
 import { brand } from "@/lib/brand";
-import { Sparkle } from "./Sparkle";
+
+const links = [
+  { href: "/generate", label: "Make a worksheet" },
+  { href: "/worksheets", label: "My worksheets" },
+  { href: "/resources", label: "Resources" },
+  { href: "/contact", label: "Contact" },
+];
 
 export function SiteFooter() {
   return (
     <footer className="border-t-2 border-line bg-white print:hidden">
-      <div className="mx-auto flex w-full max-w-5xl items-center gap-2 px-6 py-5 text-sm text-muted">
-        <Sparkle className="h-4 w-4 text-blush" />
-        <span>
-          {brand.name} · {brand.tagline}
-        </span>
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-5 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="flex items-center gap-3">
+          <Image src={brand.logoSrc} alt="" width={768} height={480} className="h-9 w-auto" />
+          <div>
+            <p className="font-display font-bold text-ink">{brand.name}</p>
+            <p className="text-sm text-muted">{brand.tagline}</p>
+          </div>
+        </div>
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className="text-muted transition-colors hover:text-ink">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );

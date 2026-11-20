@@ -4,60 +4,192 @@
    "dark:" classes only apply inside an element with class="dark". */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Mayuri Teaches brand, taken from the logo. */
+/* ------------------------------------------------------------------
+   Mayuri Teaches design tokens (colours come from the logo)
+   ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #1800ad; /* deep indigo: logo arch and wordmark */
-  --color-royal: #5232ef; /* bookshelf */
-  --color-violet: #8c52ff; /* first book */
-  --color-orchid: #cb6ce6; /* second book */
-  --color-lilac: #e2a9f1; /* third book */
-  --color-blush: #f6b4ef; /* sparkles */
+  --color-ink: #1800ad; /* logo arch and wordmark: text, primary buttons */
+  --color-ink-deep: #0f0070; /* button "stamp" shadow, dark bands */
+  --color-royal: #5232ef; /* bookshelf: hover states, Science */
+  --color-violet: #8c52ff; /* first book: accent, focus, Math */
+  --color-orchid: #cb6ce6; /* second book: French */
+  --color-lilac: #e2a9f1; /* third book: soft borders and surfaces */
+  --color-blush: #f6b4ef; /* sparkles: Social Studies, highlights */
 
   --color-paper: #fbf8ff; /* page background */
   --color-text: #241a4f; /* body text */
-  --color-muted: #6a6191; /* secondary text */
-  --color-line: #e6dcfa; /* borders and dividers */
+  --color-muted: #625a8a; /* secondary text (AA contrast on paper) */
+  --color-line: #e9e1fb; /* borders and dividers */
 
   --font-sans: var(--font-sniglet), ui-rounded, ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --animate-settle: settle 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-sheet-in: sheet-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-pop: pop 160ms ease-out both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(24px) rotate(0deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--tilt, 0deg));
+  }
+}
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-text);
+  /* Fraunces' "soft" axis rounds its corners to match Sniglet and the logo.
+     Fonts without this axis ignore it. */
+  font-variation-settings: "SOFT" 100;
 }
 
-/* Shared styles so every page looks the same. */
+/* One consistent, clearly visible keyboard focus style everywhere. */
+:focus-visible {
+  outline: 3px solid var(--color-violet);
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+/* Headings break into evenly balanced lines, so no word is left on its own. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-lilac);
+  color: var(--color-ink);
+}
+
+/* ------------------------------------------------------------------
+   Shared components
+   ------------------------------------------------------------------ */
 @layer components {
+  /* Buttons press down like a classroom stamp: a solid shadow that collapses on click. */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-ink px-5 py-2 font-display font-medium text-white transition-colors hover:bg-royal disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 font-display font-medium text-white shadow-[0_3px_0_0_var(--color-ink-deep)] transition-[transform,box-shadow,background-color] duration-150 hover:-translate-y-px hover:bg-royal hover:shadow-[0_4px_0_0_var(--color-ink-deep)] active:translate-y-[3px] active:shadow-none disabled:pointer-events-none disabled:opacity-50;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border-2 border-lilac bg-white px-4 py-1.5 font-display text-sm font-medium text-ink transition-colors hover:border-violet hover:bg-paper disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-lilac bg-white px-4 py-1.5 font-display text-sm font-medium text-ink shadow-[0_3px_0_0_var(--color-lilac)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-px hover:border-violet hover:shadow-[0_4px_0_0_var(--color-violet)] active:translate-y-[3px] active:shadow-none disabled:pointer-events-none disabled:opacity-50;
   }
   .input {
-    @apply rounded-xl border-2 border-line bg-white px-3 py-2 text-base text-text outline-none focus:border-violet;
+    @apply w-full rounded-2xl border-2 border-line bg-white px-4 py-2.5 text-base text-text transition-[border-color,box-shadow] outline-none placeholder:text-muted/70 hover:border-lilac focus:border-violet focus:ring-4 focus:ring-violet/15;
   }
   .link {
-    @apply text-ink underline decoration-lilac decoration-2 underline-offset-4 hover:decoration-violet;
+    @apply text-ink underline decoration-lilac decoration-2 underline-offset-4 transition-colors hover:decoration-violet;
   }
   .page-title {
-    @apply font-display text-3xl font-black tracking-tight text-ink;
+    @apply font-display text-[clamp(2rem,1.5rem+1.6vw,2.75rem)] leading-[1.1] font-extrabold tracking-tight text-ink;
+  }
+  .section-title {
+    @apply font-display text-[1.75rem] leading-tight font-bold tracking-tight text-ink;
   }
   .card {
     @apply rounded-3xl border-2 border-line bg-white;
   }
+  /* Cards that are links lift and gain a stamp shadow, so it's clear they're clickable. */
+  .card-link {
+    @apply transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-lilac hover:shadow-[0_6px_0_0_var(--color-lilac)] active:translate-y-0 active:shadow-none;
+  }
+  /* A selectable button made from a real radio input (keyboard and screen reader friendly). */
+  .choice {
+    @apply relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-line bg-white px-3 py-2 text-sm text-text transition-[border-color,background-color,color,box-shadow] select-none hover:border-lilac has-checked:border-ink has-checked:bg-ink has-checked:text-white has-checked:shadow-[0_3px_0_0_var(--color-ink-deep)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-violet;
+  }
   .alert {
-    @apply rounded-xl px-3 py-2 text-sm;
+    @apply flex items-start gap-2 rounded-2xl px-4 py-3 text-sm;
   }
   .alert-error {
-    @apply bg-red-50 text-red-700;
+    @apply border-2 border-red-200 bg-red-50 text-red-800;
   }
   .alert-success {
-    @apply bg-violet/10 text-ink;
+    @apply border-2 border-violet/20 bg-violet/10 text-ink;
   }
   .alert-warning {
-    @apply bg-amber-50 text-amber-800;
+    @apply border-2 border-amber-200 bg-amber-50 text-amber-900;
+  }
+  /* Exercise-book paper: faint ruled lines, plus a margin line on wider screens
+     (phones have no room for a margin, so it would run through the content). */
+  .ruled {
+    background-color: #f5edff;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 31px,
+      rgb(140 82 255 / 0.13) 31px 32px
+    );
+  }
+  @media (min-width: 640px) {
+    .ruled {
+      background-image:
+        linear-gradient(
+          to right,
+          transparent 0 3.5rem,
+          rgb(203 108 230 / 0.35) 3.5rem calc(3.5rem + 2px),
+          transparent calc(3.5rem + 2px)
+        ),
+        repeating-linear-gradient(to bottom, transparent 0 31px, rgb(140 82 255 / 0.13) 31px 32px);
+    }
+  }
+  /* Dotted grid paper, used behind the hero. */
+  .dotted {
+    background-image: radial-gradient(rgb(140 82 255 / 0.18) 1.2px, transparent 1.2px);
+    background-size: 22px 22px;
+  }
+  /* Placeholder bars with a soft moving sheen while content loads. */
+  .skeleton {
+    @apply animate-shimmer rounded-full;
+    background-image: linear-gradient(90deg, #efe7fd 25%, #f8f3ff 50%, #efe7fd 75%);
+    background-size: 200% 100%;
+  }
+}
+
+/* Respect people who've asked their system for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

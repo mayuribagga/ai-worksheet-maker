@@ -45,3 +45,10 @@ export function worksheetJsonSchema() {
   delete schema.$schema; // Claude's API doesn't need the schema version
   return schema;
 }
+
+// Which curriculum topic a worksheet is for.
+export type WorksheetMeta = {
+  grade: number;
+  subject: import("@/data/curriculum").SubjectId;
+  topicId: string;
+};

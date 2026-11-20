@@ -1,17 +1,19 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { brand } from "@/lib/brand";
-import type { Worksheet } from "@/lib/worksheet";
+import { describeTopic, type TopicDescription } from "@/data/curriculum";
+import type { Worksheet, WorksheetMeta } from "@/lib/worksheet";
 import { Sparkle } from "./Sparkle";
 
 const letters = ["A", "B", "C", "D"];
 
 // A worksheet laid out for printing on Letter paper:
 // page 1 is the worksheet, page 2 is the answer key.
-export function PrintableWorksheet({ worksheet, label }: { worksheet: Worksheet; label: string }) {
+export function PrintableWorksheet({ worksheet, meta }: { worksheet: Worksheet; meta: WorksheetMeta }) {
+  const description = describeTopic(meta.grade, meta.subject, meta.topicId);
   return (
     <div className="flex flex-col items-center gap-8 print:block">
-      <Sheet label={label} pageLabel="Worksheet">
+      <Sheet description={description} pageLabel="Worksheet">
         <h1 className="font-display text-3xl font-black tracking-tight text-ink">{worksheet.title}</h1>
         <p className="mt-1">{worksheet.instructions}</p>
         <p className="mt-4 text-sm">
@@ -39,7 +41,7 @@ export function PrintableWorksheet({ worksheet, label }: { worksheet: Worksheet;
         </ol>
       </Sheet>
 
-      <Sheet label={label} pageLabel="Answer key" newPage>
+      <Sheet description={description} pageLabel="Answer key" newPage>
         <h1 className="font-display text-3xl font-black tracking-tight text-ink">Answer key</h1>
         <p className="mt-1">{worksheet.title}</p>
 
@@ -63,12 +65,12 @@ export function PrintableWorksheet({ worksheet, label }: { worksheet: Worksheet;
 
 // One printed page with the branded header and footer.
 function Sheet({
-  label,
+  description,
   pageLabel,
   newPage = false,
   children,
 }: {
-  label: string;
+  description: TopicDescription;
   pageLabel: string;
   newPage?: boolean;
   children: ReactNode;
@@ -88,7 +90,12 @@ function Sheet({
           />
           <p className="mt-1 text-xs text-muted">{brand.tagline}</p>
         </div>
-        <p className="text-right text-xs text-muted">{label}</p>
+        <div className="text-right text-xs leading-snug text-muted">
+          <p>
+            {description.gradeLabel} {description.subjectName}
+          </p>
+          <p className="text-ink">{description.topicName}</p>
+        </div>
       </header>
 
       <div className="flex-1 py-8">{children}</div>

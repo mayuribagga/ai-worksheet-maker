@@ -37,7 +37,12 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   const credentials = getCredentials(formData);
 
-  // The form already checks this, but never trust input from the browser.
+  const name = String(formData.get("name") ?? "").trim();
+
+  // The form already checks these, but never trust input from the browser.
+  if (name.length < 1 || name.length > 60) {
+    redirect(`/signup?error=${encodeURIComponent("Please enter your name (up to 60 characters).")}`);
+  }
   if (!meetsPasswordRules(credentials.password)) {
     redirect(`/signup?error=${encodeURIComponent("Password doesn't meet the requirements.")}`);
   }
@@ -47,7 +52,11 @@ export async function signup(formData: FormData) {
 
   const { error } = await supabase.auth.signUp({
     ...credentials,
-    options: { emailRedirectTo: `${origin}/auth/callback` },
+    options: {
+      emailRedirectTo: `${origin}/auth/callback`,
+      // Saved with the account and included in the login, so the header can show it.
+      data: { full_name: name },
+    },
   });
 
   if (error) {

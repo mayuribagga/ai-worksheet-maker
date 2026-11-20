@@ -1,18 +1,19 @@
 "use server";
 
 import Anthropic from "@anthropic-ai/sdk";
-import { findTopic, subjectNames, topicLabel, type SubjectId } from "@/data/curriculum";
+import { findTopic, subjectNames, type SubjectId } from "@/data/curriculum";
 import { createClient } from "@/lib/supabase/server";
 import {
   parseWorksheet,
   QUESTION_COUNT,
   worksheetJsonSchema,
   type Worksheet,
+  type WorksheetMeta,
 } from "@/lib/worksheet";
 
 export type GenerateState = {
   worksheet?: Worksheet;
-  label?: string;
+  meta?: WorksheetMeta;
   savedId?: string;
   saveFailed?: boolean;
   remainingToday?: number;
@@ -56,7 +57,7 @@ export async function generateWorksheet(
   }
 
   const anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY
-  const label = topicLabel(grade, subject, topic.id);
+  const meta: WorksheetMeta = { grade, subject, topicId: topic.id };
 
   const request =
     `Write a Grade ${grade} ${subjectNames[subject]} worksheet on "${topic.name}" ` +
@@ -116,7 +117,7 @@ export async function generateWorksheet(
 
         return {
           worksheet: result.worksheet,
-          label,
+          meta,
           savedId: saved?.id,
           saveFailed: Boolean(saveError),
           remainingToday,
