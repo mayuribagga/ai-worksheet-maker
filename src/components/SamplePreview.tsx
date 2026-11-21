@@ -4,9 +4,10 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { describeTopic } from "@/data/curriculum";
 import type { Sample } from "@/data/samples";
 import { subjectStyles } from "@/lib/subjects";
+import { questionCount } from "@/lib/worksheet";
 import { SubjectIcon } from "./Icons";
-
-const letters = ["A", "B", "C", "D"];
+import { labelsFor, sheetLanguage } from "./worksheet/labels";
+import { WorksheetBody } from "./worksheet/WorksheetBody";
 
 // The home page's live sample: subject tabs that swap a stack of worksheet pages.
 export function SamplePreview({ samples }: { samples: Sample[] }) {
@@ -75,7 +76,7 @@ export function SamplePreview({ samples }: { samples: Sample[] }) {
         >
           <article
             key={sample.id}
-            className="animate-sheet-in relative h-[31rem] overflow-hidden rounded-2xl border-2 border-line bg-white px-7 pt-6 shadow-[0_18px_40px_-18px_rgb(24_0_173/0.35)]"
+            className="animate-sheet-in relative h-[31rem] overflow-hidden rounded-2xl border-2 border-line bg-white px-7 pt-6 shadow-[0_18px_40px_-18px_rgb(0_74_173/0.35)]"
           >
             {/* A strip of tape holding the page down. */}
             <span
@@ -86,51 +87,38 @@ export function SamplePreview({ samples }: { samples: Sample[] }) {
               <span aria-hidden className={`h-2 w-2 rounded-full ${subjectStyles[sample.meta.subject].dot}`} />
               {description.gradeLabel} {description.subjectName}, {description.topicName}
             </p>
-            <h3 className="mt-2 font-display text-[1.4rem] leading-tight font-bold text-ink">
+            <h2 className="mt-2 font-display text-[1.4rem] leading-tight font-bold text-ink">
               {sample.worksheet.title}
-            </h3>
+            </h2>
             <p className="mt-1 text-sm text-muted">{sample.worksheet.instructions}</p>
             <div className="mt-3 grid grid-cols-[auto_1fr_auto_5rem] items-end gap-x-2 text-xs text-muted">
-              <span>Name</span>
+              <span>{labelsFor(sheetLanguage(sample.meta.subject)).name}</span>
               <span className="border-b-2 border-dotted border-lilac" />
               <span>Date</span>
               <span className="border-b-2 border-dotted border-lilac" />
             </div>
 
-            <ol className="mt-5 flex flex-col gap-4 text-sm">
-              {sample.worksheet.questions.slice(0, 3).map((question, i) => (
-                <li key={i} className="grid grid-cols-[1.25rem_1fr] gap-x-1.5">
-                  <span className="font-display font-bold text-violet">{i + 1}</span>
-                  <div>
-                    <p className="text-text">{question.prompt}</p>
-                    <ul className="mt-1.5 grid grid-cols-2 gap-x-3 gap-y-1">
-                      {question.choices.map((choice, j) => {
-                        // The first answer is filled in, as if a student has started.
-                        const filled = i === 0 && j === question.answerIndex;
-                        return (
-                          <li key={j} className="flex items-center gap-1.5 text-text">
-                            <span
-                              aria-hidden
-                              className={`h-3.5 w-3.5 shrink-0 rounded-full border-2 ${filled ? "border-violet bg-violet" : "border-lilac"}`}
-                            />
-                            <span className="truncate">
-                              {letters[j]}. {choice}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            {/* The first part of the sample, at a smaller size. */}
+            <div className="mt-5 text-sm [&_h3]:text-base">
+              <WorksheetBody
+                worksheet={{
+                  ...sample.worksheet,
+                  // Rule boxes take up the small preview, so it shows the questions instead.
+                  sections: sample.worksheet.sections.slice(0, 1).map((sec) =>
+                    sec.stimulus?.kind === "rule" ? { ...sec, stimulus: undefined } : sec,
+                  ),
+                }}
+                lang={sheetLanguage(sample.meta.subject)}
+              />
+            </div>
 
             <div
               aria-hidden
               className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent"
             />
             <p className="absolute inset-x-0 bottom-4 text-center text-xs text-muted">
-              + 2 more questions and an answer key
+              + {questionCount(sample.worksheet) - sample.worksheet.sections[0].questions.length} more
+              questions and an answer key
             </p>
           </article>
         </div>

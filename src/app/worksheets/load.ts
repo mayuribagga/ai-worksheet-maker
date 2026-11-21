@@ -1,4 +1,5 @@
 import type { SubjectId } from "@/data/curriculum";
+import { isResourceKind } from "@/data/resource-kinds";
 import { createClient } from "@/lib/supabase/server";
 import { parseWorksheet, type Worksheet, type WorksheetMeta } from "@/lib/worksheet";
 
@@ -13,7 +14,7 @@ export async function loadWorksheet(id: string): Promise<LoadedWorksheet> {
   const supabase = await createClient();
   const { data: row } = await supabase
     .from("worksheets")
-    .select("id, grade, subject, topic_id, content")
+    .select("id, grade, subject, topic_id, style_id, content")
     .eq("id", id)
     .maybeSingle();
 
@@ -32,6 +33,12 @@ export async function loadWorksheet(id: string): Promise<LoadedWorksheet> {
     status: "ok",
     id: row.id,
     worksheet: parsed.worksheet,
-    meta: { grade: row.grade, subject: row.subject as SubjectId, topicId: row.topic_id },
+    meta: {
+      grade: row.grade,
+      subject: row.subject as SubjectId,
+      topicId: row.topic_id,
+      // Worksheets saved before resource kinds were "multiple-choice" worksheets.
+      kind: isResourceKind(row.style_id) ? row.style_id : "worksheet",
+    },
   };
 }
