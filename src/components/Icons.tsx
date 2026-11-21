@@ -1,4 +1,5 @@
-import type { SubjectId } from "@/data/curriculum";
+import type { ResourceKind } from "@/data/resource-kinds";
+import type { SubjectId } from "@/data/subjects";
 
 // Small hand-drawn-style line icons, sized and coloured by their parent.
 type IconProps = { className?: string };
@@ -91,6 +92,7 @@ export function SubjectIcon({ subject, className }: IconProps & { subject: Subje
         </Svg>
       );
     case "french":
+    case "french-immersion":
       return (
         <Svg className={className}>
           <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5z" />
@@ -104,7 +106,24 @@ export function SubjectIcon({ subject, className }: IconProps & { subject: Subje
           <path d="M7.5 15h9" />
         </Svg>
       );
+    case "history":
+      // An hourglass.
+      return (
+        <Svg className={className}>
+          <path d="M6.5 3.5h11M6.5 20.5h11M8 3.5v2.8a4 4 0 0 0 1.6 3.2L12 12l2.4-2.5A4 4 0 0 0 16 6.3V3.5M8 20.5v-2.8a4 4 0 0 1 1.6-3.2L12 12l2.4 2.5a4 4 0 0 1 1.6 3.2v2.8" />
+        </Svg>
+      );
+    case "social-studies":
+      // Two people side by side: community.
+      return (
+        <Svg className={className}>
+          <circle cx="8.5" cy="8" r="2.75" />
+          <circle cx="16" cy="9" r="2.25" />
+          <path d="M3.5 19a5 5 0 0 1 10 0M13.5 15.2a4.2 4.2 0 0 1 7 3.3" />
+        </Svg>
+      );
     default:
+      // A globe, for Geography.
       return (
         <Svg className={className}>
           <circle cx="12" cy="12" r="8.5" />
@@ -112,4 +131,60 @@ export function SubjectIcon({ subject, className }: IconProps & { subject: Subje
         </Svg>
       );
   }
+}
+
+// One icon per kind of resource, for the library's resource cards.
+export function KindIcon({ kind, className }: IconProps & { kind: ResourceKind }) {
+  switch (kind) {
+    case "worksheet":
+      return (
+        <Svg className={className}>
+          <path d="M6.5 3.5h8l3 3v14h-11z" />
+          <path d="M9 10h6M9 13.5h6M9 17h4" />
+        </Svg>
+      );
+    case "practice":
+      return (
+        <Svg className={className}>
+          <path d="m14.5 5.5 4 4L9 19H5v-4z" />
+          <path d="m12.5 7.5 4 4" />
+        </Svg>
+      );
+    case "quiz":
+      return (
+        <Svg className={className}>
+          <path d="m4.5 7 1.5 1.5 3-3M4.5 15l1.5 1.5 3-3" />
+          <path d="M12 7.5h7.5M12 15.5h7.5" />
+        </Svg>
+      );
+    case "test":
+      return (
+        <Svg className={className}>
+          <path d="M9 4.5H6.5v16h11v-16H15" />
+          <path d="M9 3.5h6v2.5H9zM9.5 11.5l1.75 1.75 3.25-3.5M9.5 17h5" />
+        </Svg>
+      );
+    case "notes":
+      return (
+        <Svg className={className}>
+          <path d="M6 3.5h11.5v17H6a1.5 1.5 0 0 1-1.5-1.5V5A1.5 1.5 0 0 1 6 3.5z" />
+          <path d="M8.5 8h6M8.5 11.5h6M8 3.5v17" />
+        </Svg>
+      );
+    case "reading":
+      return (
+        <Svg className={className}>
+          <path d="M12 6.5c-1.8-1.4-4.5-2-8-2v13c3.5 0 6.2.6 8 2 1.8-1.4 4.5-2 8-2v-13c-3.5 0-6.2.6-8 2z" />
+          <path d="M12 6.5v13" />
+        </Svg>
+      );
+  }
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" />
+    </Svg>
+  );
 }
