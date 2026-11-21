@@ -14,17 +14,17 @@ const steps = [
   {
     icon: ChooseIcon,
     title: "Choose a topic",
-    text: "Pick a grade, subject and topic straight from the Ontario curriculum.",
+    text: "Find it in the library by grade and subject, straight from the Ontario curriculum.",
   },
   {
     icon: SparkleWandIcon,
     title: "Generate",
-    text: "Five multiple-choice questions written for that grade, plus an answer key.",
+    text: "A worksheet, quiz, test, study notes or reading, written for that grade, with an answer key.",
   },
   {
     icon: PrinterIcon,
     title: "Print",
-    text: "Print it or save it as a PDF. The answer key prints on its own page.",
+    text: "Print it or save it as a PDF. The answer key prints after the sheet.",
   },
 ];
 
@@ -40,11 +40,11 @@ export default function Home() {
         <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-14 sm:px-6 lg:grid-cols-[1.15fr_1fr] lg:py-20">
           <div className="flex flex-col gap-6">
             <h1 className="font-display text-[clamp(2.25rem,1.5rem+2.4vw,3.25rem)] leading-[1.06] font-extrabold tracking-tight text-ink">
-              Ready-to-print worksheets for every Ontario lesson
+              Ready-to-print worksheets for every lesson
             </h1>
             <p className="max-w-[34rem] text-lg leading-relaxed text-muted">
-              Choose a grade, subject and topic from the Grades 1 to 8 curriculum, and get five
-              questions and an answer key in seconds.
+              Choose a topic from the Grades 1 to 8 curriculum and get a worksheet, quiz or test
+              with mixed questions and an answer key, ready to print.
             </p>
             <Suspense fallback={<div className="h-14" />}>
               <HeroActions />
@@ -66,7 +66,7 @@ export default function Home() {
             <li key={step.title} className="relative flex gap-4 md:flex-col md:items-center md:text-center">
               <span className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-line bg-white text-ink shadow-[0_3px_0_0_var(--color-line)]">
                 <step.icon className="h-6 w-6" />
-                <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-violet font-display text-xs font-bold text-white">
+                <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-royal font-display text-xs font-bold text-white">
                   {i + 1}
                 </span>
               </span>
@@ -86,15 +86,14 @@ export default function Home() {
             <h2 id="subjects-heading" className="section-title">
               {totalTopics} curriculum topics to choose from
             </h2>
-            <p className="text-muted">Taller books have more topics.</p>
           </div>
-          <Link href="/generate" className="link text-sm">
-            Browse topics
+          <Link href="/library" className="link text-sm">
+            Browse the library
           </Link>
         </div>
 
-        <div className="mt-8 -mx-5 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0">
-          <ul className="flex min-w-[46rem] items-end gap-3 border-b-[10px] border-royal pb-0">
+        <div className="mt-8 hidden sm:block">
+          <ul className="flex items-end gap-2 border-b-[10px] border-royal pb-0 lg:gap-3">
             {summaries.map((summary) => {
               const style = subjectStyles[summary.subject];
               const height = 9 + (summary.topicCount / maxTopics) * 8; // 9rem to 17rem
@@ -105,11 +104,11 @@ export default function Home() {
                   className={`flex flex-1 flex-col justify-between overflow-hidden rounded-t-xl border-2 border-b-0 ${style.border} ${style.tint} bg-white`}
                 >
                   <div className={`h-2.5 ${style.spine}`} />
-                  <div className="flex flex-1 flex-col justify-end gap-1 p-4">
+                  <div className="flex flex-1 flex-col justify-end gap-1 p-3 lg:p-4">
                     <SubjectIcon subject={summary.subject} className="mb-auto h-6 w-6 text-ink" />
                     <h3
                       title={subjectNames[summary.subject]}
-                      className="font-display text-lg leading-tight font-bold text-ink"
+                      className="font-display text-base leading-tight font-bold text-ink lg:text-lg"
                     >
                       {style.short}
                     </h3>
@@ -126,6 +125,31 @@ export default function Home() {
             })}
           </ul>
         </div>
+
+        {/* On phones the books lie flat in a stack; length shows how many topics. */}
+        <ul className="mt-6 flex flex-col gap-2 sm:hidden">
+          {summaries.map((summary) => {
+            const style = subjectStyles[summary.subject];
+            return (
+              <li key={summary.subject}>
+                <div
+                  style={{ width: `${70 + (summary.topicCount / maxTopics) * 30}%` }}
+                  className={`flex items-center gap-3 overflow-hidden rounded-r-xl border-2 border-l-0 bg-white ${style.border}`}
+                >
+                  <span aria-hidden className={`w-2.5 self-stretch ${style.spine}`} />
+                  <SubjectIcon subject={summary.subject} className="h-5 w-5 shrink-0 text-ink" />
+                  <span className="flex min-w-0 flex-1 flex-col py-2">
+                    <span className="truncate font-display leading-tight font-bold text-ink">{style.short}</span>
+                    <span className="text-xs text-muted">
+                      Grades {summary.firstGrade} to {summary.lastGrade}
+                    </span>
+                  </span>
+                  <span className="pr-3 font-display text-lg font-bold text-ink">{summary.topicCount}</span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       {/* Mayuri's own resources, on exercise-book paper. */}

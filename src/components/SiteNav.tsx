@@ -6,6 +6,7 @@ import { Suspense, useCallback, useRef, useState } from "react";
 import { useDismiss } from "./useDismiss";
 
 const links = [
+  { href: "/library", label: "Library" },
   { href: "/resources", label: "Resources" },
   { href: "/contact", label: "Contact" },
 ];
@@ -38,7 +39,7 @@ function NavLinks({ pathname }: { pathname: string | null }) {
           <Link
             key={link.href}
             href={link.href}
-            aria-current={pathname === link.href ? "page" : undefined}
+            aria-current={pathname === link.href || pathname?.startsWith(`${link.href}/`) ? "page" : undefined}
             className="rounded-full px-3.5 py-1.5 text-sm text-text transition-colors hover:bg-paper hover:text-ink aria-[current=page]:bg-lilac/35 aria-[current=page]:text-ink"
           >
             {link.label}
@@ -60,14 +61,14 @@ function NavLinks({ pathname }: { pathname: string | null }) {
           <nav
             id="mobile-menu"
             aria-label="Main"
-            className="card absolute top-full right-0 z-20 mt-2 flex w-52 origin-top-right animate-pop flex-col p-2 shadow-[0_12px_30px_-12px_rgb(24_0_173/0.3)]"
+            className="card absolute top-full right-0 z-20 mt-2 flex w-52 origin-top-right animate-pop flex-col p-2 shadow-[0_12px_30px_-12px_rgb(0_74_173/0.3)]"
           >
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={close}
-                aria-current={pathname === link.href ? "page" : undefined}
+                aria-current={pathname === link.href || pathname?.startsWith(`${link.href}/`) ? "page" : undefined}
                 className="rounded-xl px-3 py-2.5 text-text transition-colors hover:bg-paper aria-[current=page]:bg-lilac/35 aria-[current=page]:text-ink"
               >
                 {link.label}

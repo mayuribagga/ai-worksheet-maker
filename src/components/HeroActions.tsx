@@ -12,8 +12,8 @@ export async function HeroActions() {
         <Link href="/generate" className="btn-primary px-6 py-3 text-lg">
           Make a worksheet
         </Link>
-        <Link href="/worksheets" className="btn-secondary px-6 py-3 text-base">
-          My worksheets
+        <Link href="/library" className="btn-secondary px-6 py-3 text-base">
+          Browse the library
         </Link>
       </div>
     );
@@ -24,8 +24,8 @@ export async function HeroActions() {
       <Link href="/signup" className="btn-primary px-6 py-3 text-lg">
         Create a free account
       </Link>
-      <Link href="/login" className="btn-secondary px-6 py-3 text-base">
-        Sign in
+      <Link href="/library" className="btn-secondary px-6 py-3 text-base">
+        Browse the library
       </Link>
     </div>
   );
