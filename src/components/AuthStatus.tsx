@@ -13,7 +13,7 @@ export async function AuthStatus() {
   if (!email) {
     return (
       <div className="flex items-center gap-4">
-        <Link href="/login" className="link text-sm">
+        <Link href="/login" className="link inline-block py-1 text-sm">
           Sign in
         </Link>
         <Link href="/signup" className="btn-primary text-sm">

@@ -8,13 +8,15 @@
    Mayuri Teaches design tokens (colours come from the logo)
    ------------------------------------------------------------------ */
 @theme {
-  --color-ink: #1800ad; /* logo arch and wordmark: text, primary buttons */
-  --color-ink-deep: #0f0070; /* button "stamp" shadow, dark bands */
-  --color-royal: #5232ef; /* bookshelf: hover states, Science */
+  --color-ink: #004aad; /* logo arch and wordmark: text, primary buttons */
+  --color-ink-deep: #00337a; /* button "stamp" shadow, dark bands */
+  --color-royal: #4513a8; /* bookshelf: hover states, Science */
   --color-violet: #8c52ff; /* first book: accent, focus, Math */
   --color-orchid: #cb6ce6; /* second book: French */
+  --color-orchid-deep: #9a3fb5; /* orchid for small text (AA contrast) */
   --color-lilac: #e2a9f1; /* third book: soft borders and surfaces */
   --color-blush: #f6b4ef; /* sparkles: Social Studies, highlights */
+  --color-sea: #2f7fb4; /* map blue: Geography */
 
   --color-paper: #fbf8ff; /* page background */
   --color-text: #241a4f; /* body text */
@@ -173,6 +175,13 @@ h3 {
     background-image: radial-gradient(rgb(140 82 255 / 0.18) 1.2px, transparent 1.2px);
     background-size: 22px 22px;
   }
+  /* Graph paper, for math working space. */
+  .grid-paper {
+    background-image:
+      linear-gradient(rgb(98 90 138 / 0.14) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(98 90 138 / 0.14) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
   /* Placeholder bars with a soft moving sheen while content loads. */
   .skeleton {
     @apply animate-shimmer rounded-full;
@@ -196,7 +205,20 @@ h3 {
 /* Printed worksheets: Letter paper with even margins, and keep brand colours. */
 @page {
   size: letter;
-  margin: 0.6in;
+  margin: 0.6in 0.6in 0.7in;
+  /* Page numbers at the bottom of every printed page. */
+  @bottom-left {
+    content: "Made with Mayuri Teaches";
+    font-family: system-ui, sans-serif;
+    font-size: 8pt;
+    color: #625a8a;
+  }
+  @bottom-right {
+    content: counter(page) " / " counter(pages);
+    font-family: system-ui, sans-serif;
+    font-size: 8pt;
+    color: #625a8a;
+  }
 }
 
 @media print {

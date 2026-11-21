@@ -3,15 +3,15 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PrintableWorksheet } from "@/components/PrintableWorksheet";
 import { loadWorksheet } from "../../load";
-import { PrintButton } from "./PrintButton";
+import { WorksheetActions } from "@/components/WorksheetActions";
 
 export default function PrintPage({ params }: PageProps<"/worksheets/[id]/print">) {
   return (
-    <div className="flex flex-1 flex-col bg-lilac/25 px-4 py-8 print:bg-white print:p-0">
+    <main className="flex flex-1 flex-col bg-lilac/25 px-3 py-8 sm:px-4 print:bg-white print:p-0">
       <Suspense fallback={<p className="text-center text-muted">Loading worksheet…</p>}>
         <PrintableSavedWorksheet params={params} />
       </Suspense>
-    </div>
+    </main>
   );
 }
 
@@ -30,15 +30,15 @@ async function PrintableSavedWorksheet({ params }: { params: Promise<{ id: strin
     <>
       {/* Toolbar shows on screen only, never on the printed page. */}
       <div className="mx-auto mb-6 flex w-full max-w-[8.5in] flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href={`/worksheets/${result.id}`} className="link text-sm">
+        <Link href={`/worksheets/${result.id}`} className="link inline-block py-1 text-sm">
           ← Back to worksheet
         </Link>
-        <div className="flex items-center gap-3">
-          <p className="text-sm text-muted">The answer key prints on page 2.</p>
-          <PrintButton />
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-muted">The answer key prints after the worksheet.</p>
+          <WorksheetActions worksheetId={result.id} />
         </div>
       </div>
-      <PrintableWorksheet worksheet={result.worksheet} meta={result.meta} />
+      <PrintableWorksheet worksheet={result.worksheet} meta={result.meta} titleAs="h1" />
     </>
   );
 }

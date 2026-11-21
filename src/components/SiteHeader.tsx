@@ -16,7 +16,7 @@ export function SiteHeader() {
           <Image
             src={brand.logoHorizontalSrc}
             alt={brand.name}
-            width={737}
+            width={764}
             height={200}
             priority
             className="h-11 w-auto"

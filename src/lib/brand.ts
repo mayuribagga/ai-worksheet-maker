@@ -3,10 +3,10 @@
 export const brand = {
   name: "Mayuri Teaches",
   tagline: "Worksheets for the Ontario curriculum",
-  color: "#1800ad",
+  color: "#004aad",
   accent: "#8c52ff",
-  logoSrc: "/logo-mark.png", // books icon, 768 × 480
-  logoFullSrc: "/logo.png", // icon with "mayuri teaches" lettering, 640 × 611
-  logoHorizontalSrc: "/logo-horizontal.png", // icon beside the lettering, 737 × 200
+  logoSrc: "/brand/logo-mark.png", // books icon, 788 × 480
+  logoFullSrc: "/brand/logo.png", // icon with "mayuri teaches" lettering, 641 × 611
+  logoHorizontalSrc: "/brand/logo-horizontal.png", // icon beside the lettering, 764 × 200
   footer: "Made with Mayuri Teaches",
 };

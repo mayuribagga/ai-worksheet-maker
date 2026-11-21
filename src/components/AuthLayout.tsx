@@ -19,7 +19,7 @@ export function AuthLayout({ title, children }: { title: string; children: React
     <main className="mx-auto grid w-full max-w-5xl flex-1 items-stretch gap-0 px-5 py-10 sm:px-6 lg:grid-cols-2 lg:py-16">
       <aside className="dotted relative hidden flex-col justify-center gap-8 overflow-hidden rounded-l-3xl border-2 border-r-0 border-line bg-paper p-10 lg:flex">
         <Sparkle className="absolute top-8 right-10 h-7 w-7 text-blush" />
-        <Image src={brand.logoSrc} alt="" width={768} height={480} className="h-20 w-auto self-start" />
+        <Image src={brand.logoSrc} alt="" width={788} height={480} className="h-20 w-auto self-start" />
         <div className="flex flex-col gap-4">
           <p className="font-display text-2xl leading-snug font-bold text-ink">
             Your worksheets, ready whenever you are.

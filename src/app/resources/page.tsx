@@ -49,7 +49,7 @@ export default async function ResourcesPage() {
       </section>
 
       <section id="python" aria-labelledby="python-heading" className="ruled scroll-mt-24 border-y-2 border-line">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-14 sm:px-6 sm:pl-20 lg:grid-cols-[22rem_1fr]">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)] gap-10 px-5 py-14 sm:px-6 sm:pl-20 lg:grid-cols-[22rem_minmax(0,1fr)]">
           <div className="flex flex-col gap-5 lg:sticky lg:top-24 lg:self-start">
             <div>
               <h2 id="python-heading" className="section-title">
@@ -72,7 +72,7 @@ export default async function ResourcesPage() {
                 )}
               </div>
               <div className="flex flex-col gap-1.5 border-t-2 border-line p-5">
-                <span className="-ml-2.5 w-fit rounded-full bg-violet px-2.5 py-0.5 text-xs text-white">
+                <span className="-ml-2.5 w-fit rounded-full bg-royal px-2.5 py-0.5 text-xs text-white">
                   Full course
                 </span>
                 <h3 className="font-display text-xl font-bold text-ink">{pythonBundle.title}</h3>

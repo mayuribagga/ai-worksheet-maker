@@ -35,7 +35,7 @@ export function AccountMenu({ email, name }: { email: string; name: string }) {
       {open && (
         <div
           id="account-menu"
-          className="card absolute top-full right-0 z-20 mt-2 flex w-64 origin-top-right animate-pop flex-col p-2 shadow-[0_12px_30px_-12px_rgb(24_0_173/0.3)]"
+          className="card absolute top-full right-0 z-20 mt-2 flex w-64 origin-top-right animate-pop flex-col p-2 shadow-[0_12px_30px_-12px_rgb(0_74_173/0.3)]"
         >
           <div className="border-b-2 border-line px-3 pt-1 pb-3">
             <p className="truncate text-ink" title={name}>

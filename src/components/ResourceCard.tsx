@@ -31,7 +31,7 @@ export async function ResourceCard({ resource }: { resource: Resource }) {
       </div>
       <div className="flex flex-1 flex-col gap-2 border-t-2 border-line p-5">
         {/* The negative margin cancels the pill's padding so its text lines up with the title. */}
-        <span className="-ml-2.5 w-fit rounded-full bg-paper px-2.5 py-0.5 text-xs text-violet">
+        <span className="-ml-2.5 w-fit rounded-full bg-paper px-2.5 py-0.5 text-xs text-royal">
           {resource.format}
         </span>
         <h3 className="font-display text-lg leading-snug font-bold text-ink">{resource.title}</h3>

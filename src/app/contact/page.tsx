@@ -29,7 +29,8 @@ export default function ContactPage() {
         <div className="flex flex-col gap-2">
           <h1 className="page-title">Get in touch</h1>
           <p className="max-w-md text-lg text-muted">
-            Send a message and I&apos;ll reply by email.
+            Hi, I&apos;m Mayuri Bagga. I create the lessons and worksheets on Mayuri Teaches. Send me a
+            message and I&apos;ll reply by email.
           </p>
         </div>
         <ul className="flex flex-col gap-4">
@@ -47,7 +48,7 @@ export default function ContactPage() {
         </ul>
       </div>
 
-      <div className="card relative p-6 shadow-[0_10px_30px_-14px_rgb(24_0_173/0.25)] sm:p-8">
+      <div className="card relative p-6 shadow-[0_10px_30px_-14px_rgb(0_74_173/0.25)] sm:p-8">
         <ContactForm />
       </div>
     </main>
