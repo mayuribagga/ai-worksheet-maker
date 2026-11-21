@@ -39,6 +39,7 @@ export async function updateSession(request: NextRequest) {
   if (!signedIn && membersOnly.some((prefix) => path.startsWith(prefix))) {
     return redirectTo(request, response, "/login", {
       message: "Please sign in to continue.",
+      next: path + request.nextUrl.search,
     });
   }
 

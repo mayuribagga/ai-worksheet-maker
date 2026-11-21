@@ -22,16 +22,24 @@ function getCredentials(formData: FormData) {
   };
 }
 
+// Only allow going back to a page on this site after signing in.
+function safeNext(value: FormDataEntryValue | null): string | undefined {
+  const next = typeof value === "string" ? value : "";
+  return next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : undefined;
+}
+
 export async function login(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(getCredentials(formData));
+  const next = safeNext(formData.get("next"));
 
   if (error) {
-    redirect(`/login?error=${encodeURIComponent(friendlyError(error))}`);
+    const params = new URLSearchParams({ error: friendlyError(error), ...(next ? { next } : {}) });
+    redirect(`/login?${params}`);
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect(next ?? "/");
 }
 
 export async function signup(formData: FormData) {

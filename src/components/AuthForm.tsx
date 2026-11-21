@@ -11,16 +11,19 @@ type AuthFormProps = {
   pendingLabel: string;
   // true on the sign-up page: shows the password rules and checks them
   isNewPassword?: boolean;
+  // Where to go after signing in, e.g. the page a visitor was trying to open
+  next?: string;
 };
 
 // Email and password form shared by the sign-in and sign-up pages.
-export function AuthForm({ action, submitLabel, pendingLabel, isNewPassword = false }: AuthFormProps) {
+export function AuthForm({ action, submitLabel, pendingLabel, isNewPassword = false, next }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const inputClass =
     "input";
 
   return (
     <form action={action} className="flex flex-col gap-4">
+      {next && <input type="hidden" name="next" value={next} />}
       {isNewPassword && (
         <label className="flex flex-col gap-1 text-sm text-ink">
           Name
