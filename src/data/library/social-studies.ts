@@ -1,0 +1,111 @@
+import { course, strand, topic } from "./build";
+
+// Social Studies, Grades 1–6, following The Ontario Curriculum: Social
+// Studies, Grades 1 to 6; History and Geography, Grades 7 and 8 (2018,
+// with the 2023 Indigenous-content revisions). Each grade has two strands:
+// A. Heritage and Identity, and B. People and Environments. The strand
+// names below are each grade's unit titles.
+
+export const socialStudies = [
+  course(1, "social-studies", [
+    strand("Our Changing Roles and Responsibilities",
+      topic("Roles at home, at school and in the community", "Our roles; How roles change as we grow; People who help us"),
+      topic("Rules and responsibilities", "Why we have rules; Being responsible; Treating others fairly"),
+      topic("Family structures and relationships", "Different kinds of families; Important people in my life; Respecting others"),
+      topic("Changes in roles over time", "How my roles have changed; Significant events in my life"),
+    ),
+    strand("The Local Community",
+      topic("Needs and wants", "What people need to live; Needs and wants; How the community meets our needs"),
+      topic("Local community services", "Community buildings and places; Community workers; Services we use"),
+      topic("People and the natural environment", "Natural and built features; How we care for our environment"),
+      topic("Indigenous communities and perspectives", "Indigenous peoples in our area; Relationships with the land; Treaties where we live"),
+      topic("Simple maps of the community", "Map symbols; Places on a map; Giving directions"),
+    ),
+  ], { title: "Our Changing Roles and Responsibilities / The Local Community" }),
+
+  course(2, "social-studies", [
+    strand("Changing Family and Community Traditions",
+      topic("Family histories and traditions", "My family's history; Family traditions; Sharing traditions"),
+      topic("Cultural celebrations", "Celebrations in Canada; How families celebrate"),
+      topic("Community traditions and change", "How traditions change over time; Traditions in my community"),
+      topic("Indigenous traditions and perspectives", "Traditions of First Nations, Métis and Inuit communities; Learning from Elders and storytellers"),
+      topic("Diversity and belonging", "Different cultural groups in Canada; Contributions of different groups; Feeling like you belong"),
+      topic("Historical landmarks", "Landmarks in my community; Why landmarks matter"),
+    ),
+    strand("Global Communities",
+      topic("Continents and oceans", "The seven continents; The five oceans; Globes and world maps"),
+      topic("Climate and landforms around the world", "Hot and cold places; Mountains, deserts and plains"),
+      topic("How people live around the world", "Homes, food and clothing; How climate affects daily life"),
+      topic("Communities and the environment", "How communities use the land; Caring for the planet"),
+    ),
+  ], { title: "Changing Family and Community Traditions / Global Communities" }),
+
+  course(3, "social-studies", [
+    strand("Communities in Canada, 1780–1850",
+      topic("Early Canadian communities", "Communities in Upper and Lower Canada; Why communities grew where they did"),
+      topic("First Nations and Métis communities", "Ways of life; Relationships with the land; Contributions to early communities"),
+      topic("European settlers and immigration", "Who came and why; Loyalists and other settlers; Settling the land"),
+      topic("Daily life in historical communities", "Homes, food and clothing; School and work; Children's lives"),
+      topic("Indigenous–European relationships", "Trade and alliances; Treaties; Cooperation and conflict"),
+    ),
+    strand("Living and Working in Ontario",
+      topic("Physical regions of Ontario", "Landforms and waterways; Regions of Ontario"),
+      topic("Land use in Ontario", "Urban and rural communities; Farming, mining, forestry and industry"),
+      topic("Natural resources", "Ontario's natural resources; Using resources responsibly"),
+      topic("Municipal government", "What municipal governments do; Services in our community"),
+      topic("Maps of Ontario", "Map elements; Reading thematic maps"),
+    ),
+  ], { title: "Communities in Canada, 1780–1850 / Living and Working in Ontario" }),
+
+  course(4, "social-studies", [
+    strand("Early Societies, 3000 BCE–1500 CE",
+      topic("Studying early societies", "Primary and secondary sources; Timelines; How we learn about the past"),
+      topic("Ancient Egypt", "The Nile and the environment; Pharaohs and social classes; Beliefs and daily life"),
+      topic("Ancient Greece", "City-states; Government and democracy; Contributions"),
+      topic("Ancient Rome", "The Republic and the Empire; Daily life; Roads, buildings and laws"),
+      topic("Early societies in North America", "Indigenous societies before 1500; Relationships with the land; Trade networks"),
+      topic("Social organization and leadership", "Social classes; Leaders and rulers"),
+      topic("Beliefs, traditions and daily life", "Religion and beliefs; Families, work and play"),
+      topic("Trade, technology and contributions", "Inventions and technology; Trade; Contributions that still matter today"),
+    ),
+    strand("Political and Physical Regions of Canada",
+      topic("Provinces, territories and capitals", "Canada's provinces and territories; Capital cities"),
+      topic("Physical regions of Canada", "The Canadian Shield, Western Cordillera and other regions; Landforms and climate"),
+      topic("Natural resources and the environment", "Resources in each region; How people use the land; Environmental impacts"),
+      topic("Maps of Canada", "Political and physical maps; Using a map scale; Map grids"),
+    ),
+  ], {
+    title: "Early Societies, 3000 BCE–1500 CE / Political and Physical Regions of Canada",
+    note: "The curriculum lets teachers choose the early societies they study. Egypt, Greece and Rome are common choices, with early societies in North America.",
+  }),
+
+  course(5, "social-studies", [
+    strand("Interactions of Indigenous Peoples and Europeans prior to 1713",
+      topic("First Nations societies before contact", "Ways of life; Governance; Relationships with the land"),
+      topic("European exploration", "Why Europeans explored; Explorers and their routes"),
+      topic("The fur trade", "How the fur trade worked; First Nations and European roles; Effects of the fur trade"),
+      topic("Indigenous–European relationships", "Alliances and trade; Conflict and disease; Different perspectives"),
+      topic("Settlement of New France", "Early settlements; Life in New France; Economic and social change"),
+    ),
+    strand("The Role of Government and Responsible Citizenship",
+      topic("Levels of government", "Federal, provincial, municipal and First Nations governments; Who is responsible for what"),
+      topic("Social and environmental issues", "Issues in Canada; How governments respond; Different points of view"),
+      topic("Rights and responsibilities of citizens", "Rights in Canada; Being an active citizen; Taking action on an issue"),
+    ),
+  ], { title: "Interactions of Indigenous Peoples and Europeans prior to 1713 / The Role of Government and Responsible Citizenship" }),
+
+  course(6, "social-studies", [
+    strand("Communities in Canada, Past and Present",
+      topic("Historical Canadian communities", "Communities that shaped Canada; Experiences of different groups"),
+      topic("Indigenous peoples in Canada, past and present", "First Nations, Métis and Inuit communities; Treaties and land; Contributions"),
+      topic("Immigration and settlement", "Why people came to Canada; Experiences of newcomers"),
+      topic("Cultural diversity and identity", "Canada's diverse communities; Canadian identity; Challenges and contributions"),
+    ),
+    strand("Canada's Interactions with the Global Community",
+      topic("Canada and the world", "Canada's role in the world; International organizations"),
+      topic("Trade and economic relationships", "What Canada trades and with whom; Effects of trade"),
+      topic("Global issues", "Environmental and social issues; Canada's response; Taking action"),
+      topic("Rights and responsibilities", "Human rights; Global citizenship"),
+    ),
+  ], { title: "Communities in Canada, Past and Present / Canada's Interactions with the Global Community" }),
+];
