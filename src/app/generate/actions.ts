@@ -3,8 +3,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { findTopic, worksheetSubjects, type SubjectId } from "@/data/curriculum";
 import { isResourceKind, kindsFor, type ResourceKind } from "@/data/resource-kinds";
+import { DAILY_LIMIT_ENABLED } from "@/lib/limits";
 import { createClient } from "@/lib/supabase/server";
 import {
+  checkGradeFit,
   checkResourceKind,
   parseWorksheet,
   worksheetJsonSchema,
@@ -22,7 +24,7 @@ export type GenerateState = {
   error?: string;
 };
 
-const MAX_ATTEMPTS = 2;
+const MAX_ATTEMPTS = 3;
 
 export async function generateWorksheet(
   _previousState: GenerateState,
@@ -54,15 +56,19 @@ export async function generateWorksheet(
     return { error: "ANTHROPIC_API_KEY is missing from .env.local." };
   }
 
-  // Count this generation against the user's daily limit. The database does
-  // the counting so the limit can't be bypassed from the browser.
-  const { data: remainingToday, error: limitError } = await supabase.rpc("use_generation");
-  if (limitError) {
-    console.error("Checking the daily limit failed:", limitError);
-    return { error: "Couldn't check your daily worksheet limit. Please try again." };
-  }
-  if (remainingToday < 0) {
-    return { error: "You've reached today's worksheet limit. You can make more tomorrow." };
+  // Count this generation against the user's daily limit, when it's on. The
+  // database does the counting so the limit can't be bypassed from the browser.
+  let remainingToday: number | undefined;
+  if (DAILY_LIMIT_ENABLED) {
+    const { data, error: limitError } = await supabase.rpc("use_generation");
+    if (limitError) {
+      console.error("Checking the daily limit failed:", limitError);
+      return { error: "Couldn't check your daily worksheet limit. Please try again." };
+    }
+    if (data < 0) {
+      return { error: "You've reached today's worksheet limit. You can make more tomorrow." };
+    }
+    remainingToday = data;
   }
 
   const anthropic = new Anthropic(); // reads ANTHROPIC_API_KEY
@@ -79,7 +85,7 @@ export async function generateWorksheet(
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       const message = await anthropic.messages.create({
         model: process.env.WORKSHEET_MODEL ?? "claude-haiku-5-5",
-        max_tokens: 8000,
+        max_tokens: 12000,
         system: styleGuide,
         tools: [
           {
@@ -95,7 +101,10 @@ export async function generateWorksheet(
 
       const toolUse = message.content.find((block) => block.type === "tool_use");
       const result = parseWorksheet(toolUse?.input);
-      problem = "worksheet" in result ? checkResourceKind(kind, result.worksheet) ?? "" : result.problem;
+      problem =
+        "worksheet" in result
+          ? (checkResourceKind(kind, result.worksheet) ?? checkGradeFit(result.worksheet, grade, kind) ?? "")
+          : result.problem;
       if (message.stop_reason === "max_tokens") {
         problem = "The resource was too long and got cut off. Make it a little shorter.";
       }

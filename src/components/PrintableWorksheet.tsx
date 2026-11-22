@@ -4,6 +4,7 @@ import { brand } from "@/lib/brand";
 import { describeTopic, type TopicDescription } from "@/data/curriculum";
 import type { Worksheet, WorksheetMeta } from "@/lib/worksheet";
 import { Sparkle } from "./Sparkle";
+import { gradeBand } from "@/lib/grade-bands";
 import { kindLabel, labelsFor, sheetLanguage } from "./worksheet/labels";
 import { SheetHeading } from "./worksheet/SheetHeading";
 import { WorksheetBody } from "./worksheet/WorksheetBody";
@@ -21,14 +22,15 @@ export function PrintableWorksheet({
 }) {
   const description = describeTopic(meta.grade, meta.subject, meta.topicId);
   const lang = sheetLanguage(meta.subject);
+  const band = gradeBand(meta.grade);
   const labels = labelsFor(lang);
   const kindName = kindLabel(meta.kind, lang);
   return (
-    <div className="flex flex-col items-center gap-8 print:block">
+    <div lang={lang} className="flex flex-col items-center gap-8 print:block">
       <Sheet description={description} pageLabel={kindName}>
         <SheetHeading worksheet={worksheet} description={description} labels={labels} kindName={kindName} titleAs={titleAs} />
         <div className="mt-8">
-          <WorksheetBody worksheet={worksheet} lang={lang} headingLevel={titleAs === "h1" ? 2 : 3} />
+          <WorksheetBody worksheet={worksheet} lang={lang} headingLevel={titleAs === "h1" ? 2 : 3} band={band} />
         </div>
       </Sheet>
 
@@ -36,7 +38,7 @@ export function PrintableWorksheet({
         <p className="text-sm text-orchid-deep">{labels.answerKey}</p>
         <h2 className="font-display text-3xl font-black tracking-tight text-ink">{worksheet.title}</h2>
         <div className="mt-8">
-          <WorksheetBody worksheet={worksheet} lang={lang} showAnswers hidePassages />
+          <WorksheetBody worksheet={worksheet} lang={lang} showAnswers hidePassages band={band} />
         </div>
       </Sheet>
     </div>

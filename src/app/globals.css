@@ -22,6 +22,7 @@
   --color-text: #241a4f; /* body text */
   --color-muted: #625a8a; /* secondary text (AA contrast on paper) */
   --color-line: #e9e1fb; /* borders and dividers */
+  --color-field: #857cad; /* form field borders (3:1 contrast, WCAG 1.4.11) */
 
   --font-sans: var(--font-sniglet), ui-rounded, ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
@@ -90,6 +91,16 @@ body {
   border-radius: 0.5rem;
 }
 
+/* On the dark blue band, a white focus ring stands out instead. */
+.bg-ink :focus-visible {
+  outline-color: white;
+}
+
+/* Keep focused elements from hiding under the sticky header (WCAG 2.4.11). */
+html {
+  scroll-padding-top: 6rem;
+}
+
 /* Headings break into evenly balanced lines, so no word is left on its own. */
 h1,
 h2,
@@ -114,7 +125,7 @@ h3 {
     @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-lilac bg-white px-4 py-1.5 font-display text-sm font-medium text-ink shadow-[0_3px_0_0_var(--color-lilac)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-px hover:border-violet hover:shadow-[0_4px_0_0_var(--color-violet)] active:translate-y-[3px] active:shadow-none disabled:pointer-events-none disabled:opacity-50;
   }
   .input {
-    @apply w-full rounded-2xl border-2 border-line bg-white px-4 py-2.5 text-base text-text transition-[border-color,box-shadow] outline-none placeholder:text-muted/70 hover:border-lilac focus:border-violet focus:ring-4 focus:ring-violet/15;
+    @apply w-full rounded-2xl border-2 border-field bg-white px-4 py-2.5 text-base text-text transition-[border-color,box-shadow] outline-none placeholder:text-muted hover:border-ink focus:border-ink focus:ring-4 focus:ring-violet/40;
   }
   .link {
     @apply text-ink underline decoration-lilac decoration-2 underline-offset-4 transition-colors hover:decoration-violet;
@@ -174,6 +185,15 @@ h3 {
   .dotted {
     background-image: radial-gradient(rgb(140 82 255 / 0.18) 1.2px, transparent 1.2px);
     background-size: 22px 22px;
+  }
+  /* Handwriting lines for young students: solid top and bottom, dashed middle. */
+  .handwriting-line {
+    border-top: 1px solid rgb(98 90 138 / 0.35);
+    border-bottom: 2px solid rgb(36 26 79 / 0.55);
+    background-image: linear-gradient(to right, rgb(98 90 138 / 0.4) 55%, transparent 45%);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: 0 50%;
   }
   /* Graph paper, for math working space. */
   .grid-paper {

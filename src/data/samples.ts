@@ -6,6 +6,92 @@ export type Sample = { id: string; meta: WorksheetMeta; worksheet: Worksheet };
 
 export const samples: Sample[] = [
   {
+    id: "grade-1-math",
+    meta: { grade: 1, subject: "math", topicId: "adding-and-subtracting-to-20", kind: "worksheet" },
+    worksheet: {
+      title: "Snack Time Adding",
+      instructions: "Count the pictures. Write how many in the box.",
+      sections: [
+        {
+          title: "Count and add",
+          instructions: "Count each group. Write the answer in the box.",
+          layout: "cards",
+          questions: [
+            {
+              type: "fill-in-the-blank",
+              prompt: "3 + 2 = ___",
+              answers: ["5"],
+              marks: 1,
+              visual: { kind: "pictures", groups: [{ picture: "apple", count: 3 }, { picture: "apple", count: 2 }], operator: "+" },
+            },
+            {
+              type: "fill-in-the-blank",
+              prompt: "4 + 4 = ___",
+              answers: ["8"],
+              marks: 1,
+              visual: { kind: "pictures", groups: [{ picture: "strawberry", count: 4 }, { picture: "strawberry", count: 4 }], operator: "+" },
+            },
+            {
+              type: "fill-in-the-blank",
+              prompt: "6 − 2 = ___",
+              answers: ["4"],
+              marks: 1,
+              visual: { kind: "pictures", groups: [{ picture: "cookie", count: 6 }, { picture: "cookie", count: 2 }], operator: "-" },
+            },
+            {
+              type: "fill-in-the-blank",
+              prompt: "There are ___ counters.",
+              answers: ["7"],
+              marks: 1,
+              visual: { kind: "ten-frame", filled: 7 },
+            },
+          ],
+        },
+        {
+          title: "Number line hops",
+          instructions: "Use the number line. Write the answer in the box.",
+          questions: [
+            {
+              type: "fill-in-the-blank",
+              prompt: "Start at 5. Hop 3 more. You land on ___.",
+              answers: ["8"],
+              marks: 1,
+              visual: { kind: "number-line", start: 0, end: 10, step: 1, marked: [5] },
+            },
+            {
+              type: "multiple-choice",
+              prompt: "Which number comes next? 10, 11, 12, ___",
+              choices: ["13", "14", "20"],
+              answerIndex: 0,
+              explanation: "Counting on by 1 from 12 gives 13.",
+              marks: 1,
+            },
+          ],
+        },
+        {
+          title: "Story problem",
+          instructions: "Read the story. Show how you know.",
+          questions: [
+            {
+              type: "show-your-work",
+              prompt: "Maya has 5 cookies. Leo gives her 4 more. How many cookies does Maya have now?",
+              answer: "9 cookies",
+              solution: ["5 + 4 = 9", "Maya has 9 cookies."],
+              marks: 2,
+            },
+            {
+              type: "short-answer",
+              prompt: "Draw 6 apples in two groups. Write a number sentence for your groups.",
+              lines: 2,
+              answer: "Any two groups that make 6, for example 4 + 2 = 6.",
+              marks: 2,
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     id: "math",
     meta: { grade: 4, subject: "math", topicId: "fractions", kind: "worksheet" },
     worksheet: {
@@ -125,6 +211,14 @@ export const samples: Sample[] = [
               explanation: "French uses avoir for age: j'ai dix ans.",
               marks: 1,
             },
+            {
+              type: "multiple-choice",
+              prompt: "Mes amis et moi, nous ___ faim.",
+              choices: ["sommes", "avons", "ont"],
+              answerIndex: 1,
+              explanation: "French says avoir faim (to be hungry), and with nous, avoir becomes avons.",
+              marks: 1,
+            },
           ],
         },
         {
@@ -136,6 +230,13 @@ export const samples: Sample[] = [
               prompt: "Il est faim.",
               lines: 1,
               answer: "Il a faim. French uses avoir for hunger: avoir faim.",
+              marks: 2,
+            },
+            {
+              type: "short-answer",
+              prompt: "Tu es dix ans.",
+              lines: 1,
+              answer: "Tu as dix ans. French uses avoir for age.",
               marks: 2,
             },
           ],
@@ -186,6 +287,13 @@ export const samples: Sample[] = [
               marks: 2,
             },
             {
+              type: "short-answer",
+              prompt: "Japan and Canada have very different areas. How many times larger is Canada's area than Japan's? Round to the nearest whole number.",
+              lines: 2,
+              answer: "About 23 times larger (8,800,000 ÷ 378,000 ≈ 23).",
+              marks: 2,
+            },
+            {
               type: "true-false",
               statement: "Canada has a high population density.",
               answer: false,
@@ -216,6 +324,19 @@ export const samples: Sample[] = [
               answer:
                 "Canada: much of the North has a very cold climate and permafrost, which makes farming and building hard. Australia: much of the interior is hot, dry desert with little fresh water.",
               marks: 4,
+            },
+            {
+              type: "multiple-choice",
+              prompt: "Which factor best explains why Bangladesh is so densely populated?",
+              choices: [
+                "Fertile river delta land that supports farming",
+                "A cold climate with long winters",
+                "Large deserts in the interior",
+                "Very few rivers",
+              ],
+              answerIndex: 0,
+              explanation: "The Ganges–Brahmaputra delta has rich soil and water, so it can support many people.",
+              marks: 1,
             },
             {
               type: "long-answer",

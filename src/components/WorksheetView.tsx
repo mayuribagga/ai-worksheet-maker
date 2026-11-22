@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { describeTopic } from "@/data/curriculum";
 import type { Worksheet, WorksheetMeta } from "@/lib/worksheet";
+import { gradeBand } from "@/lib/grade-bands";
 import { TopicTags } from "./TopicTags";
 import { kindLabel, labelsFor, sheetLanguage } from "./worksheet/labels";
 import { SheetHeading } from "./worksheet/SheetHeading";
@@ -24,7 +25,7 @@ export function WorksheetView({
   const lang = sheetLanguage(meta.subject);
 
   return (
-    <article className="animate-sheet-in overflow-hidden rounded-3xl border-2 border-line bg-white shadow-[0_10px_30px_-12px_rgb(0_74_173/0.25)]">
+    <article lang={lang} className="animate-sheet-in overflow-hidden rounded-3xl border-2 border-line bg-white shadow-[0_10px_30px_-12px_rgb(0_74_173/0.25)]">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-line bg-paper/60 px-6 py-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <TopicTags subject={meta.subject} description={description} size="sm" />
@@ -40,11 +41,11 @@ export function WorksheetView({
             role="switch"
             aria-checked={showAnswers}
             onClick={() => setShowAnswers(!showAnswers)}
-            className="relative h-6 w-11 rounded-full bg-line transition-colors aria-checked:bg-violet"
+            className="relative h-6 w-11 rounded-full border-2 border-field bg-line transition-colors aria-checked:border-royal aria-checked:bg-royal"
           >
             <span
               aria-hidden
-              className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${showAnswers ? "translate-x-5" : ""}`}
+              className={`absolute top-px left-px h-4 w-4 rounded-full bg-white shadow ring-1 ring-field transition-transform ${showAnswers ? "translate-x-5" : ""}`}
             />
           </button>
         </label>
@@ -63,6 +64,7 @@ export function WorksheetView({
           lang={lang}
           showAnswers={showAnswers}
           headingLevel={titleAs === "h1" ? 2 : 3}
+          band={gradeBand(meta.grade)}
         />
       </div>
     </article>

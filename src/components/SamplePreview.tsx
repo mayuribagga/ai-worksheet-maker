@@ -4,6 +4,7 @@ import { useRef, useState, type KeyboardEvent } from "react";
 import { describeTopic } from "@/data/curriculum";
 import type { Sample } from "@/data/samples";
 import { subjectStyles } from "@/lib/subjects";
+import { gradeBand } from "@/lib/grade-bands";
 import { questionCount } from "@/lib/worksheet";
 import { SubjectIcon } from "./Icons";
 import { labelsFor, sheetLanguage } from "./worksheet/labels";
@@ -31,7 +32,7 @@ export function SamplePreview({ samples }: { samples: Sample[] }) {
         role="tablist"
         aria-label="Sample worksheets"
         onKeyDown={onKeyDown}
-        className="flex gap-1 rounded-full border-2 border-line bg-white p-1"
+        className="flex flex-wrap justify-center gap-1 rounded-3xl border-2 border-line bg-white p-1"
       >
         {samples.map((s, i) => (
           <button
@@ -49,7 +50,7 @@ export function SamplePreview({ samples }: { samples: Sample[] }) {
             className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm text-muted transition-colors hover:text-ink aria-selected:bg-ink aria-selected:text-white"
           >
             <SubjectIcon subject={s.meta.subject} className="h-4 w-4" />
-            {subjectStyles[s.meta.subject].short}
+            Gr {s.meta.grade} {subjectStyles[s.meta.subject].short}
           </button>
         ))}
       </div>
@@ -76,6 +77,7 @@ export function SamplePreview({ samples }: { samples: Sample[] }) {
         >
           <article
             key={sample.id}
+            lang={sheetLanguage(sample.meta.subject)}
             className="animate-sheet-in relative h-[31rem] overflow-hidden rounded-2xl border-2 border-line bg-white px-7 pt-6 shadow-[0_18px_40px_-18px_rgb(0_74_173/0.35)]"
           >
             {/* A strip of tape holding the page down. */}
@@ -109,6 +111,7 @@ export function SamplePreview({ samples }: { samples: Sample[] }) {
                   ),
                 }}
                 lang={sheetLanguage(sample.meta.subject)}
+                band={gradeBand(sample.meta.grade)}
               />
             </div>
 

@@ -1,9 +1,26 @@
 import path from "node:path";
-import { Document, Font, Image, Line, Page, StyleSheet, Svg, Text, View } from "@react-pdf/renderer";
-import type { ReactNode } from "react";
+import {
+  Circle,
+  Document,
+  Font,
+  Image,
+  Line,
+  Page,
+  Path,
+  Rect,
+  StyleSheet,
+  Svg,
+  Text,
+  Text as SvgText,
+  View,
+} from "@react-pdf/renderer";
+import type { ComponentType, ReactNode } from "react";
 import { kindLabel, labelsFor, sheetLanguage, type SheetLabels } from "@/components/worksheet/labels";
 import { describeTopic, type TopicDescription } from "@/data/curriculum";
 import { brand } from "@/lib/brand";
+import { gradeBand, type GradeBand } from "@/lib/grade-bands";
+import { picturePath, type PictureName } from "@/lib/pictures";
+import { drawVisual, type Prim } from "@/components/worksheet/visual-geometry";
 import {
   matchingOrder,
   sectionMarks,
@@ -12,6 +29,7 @@ import {
   type NoteBlock,
   type Question,
   type Stimulus,
+  type Visual,
   type Worksheet,
   type WorksheetMeta,
 } from "@/lib/worksheet";
@@ -43,6 +61,17 @@ Font.register({ family: "NotoSansMath", src: path.join(fontDir, "noto-sans-math-
 Font.registerHyphenationCallback((word) => [word]);
 
 const logoPath = path.join(process.cwd(), "public", brand.logoHorizontalSrc);
+const pictureFile = (name: PictureName) => path.join(process.cwd(), "public", picturePath(name));
+
+// How the PDF looks for each age group, matching the web version: bigger type,
+// handwriting lines and answer boxes for Grades 1 and 2, a denser page for 7 and 8.
+type PdfLook = { fontSize: number; line: number; handwriting: boolean; boxes: boolean; big: boolean; gap: number; work: number };
+const pdfLooks: Record<GradeBand, PdfLook> = {
+  early: { fontSize: 13.5, line: 34, handwriting: true, boxes: true, big: true, gap: 16, work: 80 },
+  primary: { fontSize: 12, line: 28, handwriting: true, boxes: false, big: false, gap: 12, work: 90 },
+  junior: { fontSize: 10.5, line: 22, handwriting: false, boxes: false, big: false, gap: 9, work: 96 },
+  intermediate: { fontSize: 10, line: 20, handwriting: false, boxes: false, big: false, gap: 8, work: 108 },
+};
 
 const ink = "#004aad";
 const violet = "#8c52ff";
@@ -115,19 +144,21 @@ export function WorksheetPdf({ worksheet, meta }: { worksheet: Worksheet; meta: 
   const lang = sheetLanguage(meta.subject);
   const labels = labelsFor(lang);
   const kindName = kindLabel(meta.kind, lang);
+  const look = pdfLooks[gradeBand(meta.grade)];
+  const page = [s.page, { fontSize: look.fontSize }];
 
   return (
     <Document title={worksheet.title} author={brand.name} subject={`${description.gradeLabel} ${description.subjectName}: ${description.topicName}`} language={lang}>
-      <Page size="LETTER" style={s.page}>
+      <Page size="LETTER" style={page}>
         <PageChrome description={description} label={kindName} labels={labels} />
         <Heading worksheet={worksheet} description={description} labels={labels} kindName={kindName} />
-        <Body worksheet={worksheet} labels={labels} showAnswers={false} />
+        <Body worksheet={worksheet} labels={labels} showAnswers={false} look={look} />
       </Page>
-      <Page size="LETTER" style={s.page}>
+      <Page size="LETTER" style={page}>
         <PageChrome description={description} label={labels.answerKey} labels={labels} />
         <Text style={s.kind}>{labels.answerKey}</Text>
         <Text style={s.title}>{worksheet.title}</Text>
-        <Body worksheet={worksheet} labels={labels} showAnswers />
+        <Body worksheet={worksheet} labels={labels} showAnswers look={look} />
       </Page>
     </Document>
   );
@@ -198,7 +229,17 @@ function Heading({
   );
 }
 
-function Body({ worksheet, labels, showAnswers }: { worksheet: Worksheet; labels: SheetLabels; showAnswers: boolean }) {
+function Body({
+  worksheet,
+  labels,
+  showAnswers,
+  look,
+}: {
+  worksheet: Worksheet;
+  labels: SheetLabels;
+  showAnswers: boolean;
+  look: PdfLook;
+}) {
   // Questions are numbered across sections: where each section starts.
   const starts = worksheet.sections.map((_, i) =>
     worksheet.sections.slice(0, i).reduce((n, sec) => n + sec.questions.length, 1),
@@ -228,12 +269,23 @@ function Body({ worksheet, labels, showAnswers }: { worksheet: Worksheet; labels
             question={question}
             labels={labels}
             showAnswers={showAnswers}
+            look={look}
+            card={section.layout === "cards"}
           />
         ));
         const passage = section.stimulus?.kind === "passage";
         return (
           <View key={i}>
-            {passage ? (
+            {section.layout === "cards" ? (
+              // Short tasks in boxes, two to a row.
+              <>
+                <View wrap={false}>
+                  {header}
+                  {section.stimulus && <StimulusBlock stimulus={section.stimulus} />}
+                </View>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>{questions}</View>
+              </>
+            ) : passage ? (
               // A passage may run onto the next page, so only ask for room
               // for its first lines below the section title.
               <>
@@ -274,17 +326,31 @@ function QuestionRow({
   question,
   labels,
   showAnswers,
+  look,
+  card,
 }: {
   number: number;
   question: Question;
   labels: SheetLabels;
   showAnswers: boolean;
+  look: PdfLook;
+  card: boolean;
 }) {
+  const cardStyle = card ? { width: "48.5%", borderWidth: 1.2, borderColor: line, borderRadius: 8, padding: 8 } : {};
   return (
-    <View style={s.question} wrap={false}>
-      <Text style={s.number}>{number}.</Text>
+    <View style={[s.question, { marginBottom: look.gap }, cardStyle]} wrap={false}>
+      {look.big ? (
+        // Young students get their question numbers in a circle.
+        <View style={{ width: 28 }}>
+          <View style={{ width: 21, height: 21, borderRadius: 10.5, backgroundColor: "#f3dcf9", alignItems: "center", justifyContent: "center" }}>
+            <Text style={{ fontFamily: display, fontWeight: 700, color: ink, fontSize: 11, lineHeight: 1 }}>{number}</Text>
+          </View>
+        </View>
+      ) : (
+        <Text style={s.number}>{number}.</Text>
+      )}
       <View style={{ flex: 1 }}>
-        <QuestionBlock question={question} labels={labels} showAnswers={showAnswers} />
+        <QuestionBlock question={question} labels={labels} showAnswers={showAnswers} look={look} card={card} />
       </View>
       <Text style={s.marks}>/{question.marks}</Text>
     </View>
@@ -373,6 +439,8 @@ function StimulusBlock({ stimulus }: { stimulus: Stimulus }) {
           ))}
         </View>
       );
+    case "visual":
+      return <VisualPdf visual={stimulus.visual} />;
     case "word-bank":
       return (
         <View style={[s.box, { borderStyle: "dashed", borderColor: lilac, flexDirection: "row", flexWrap: "wrap", justifyContent: "center" }]} wrap={false}>
@@ -411,12 +479,27 @@ function WithBlanks({ value, answers }: { value: string; answers?: string[] }) {
   );
 }
 
-function QuestionBlock({ question, labels, showAnswers }: { question: Question; labels: SheetLabels; showAnswers: boolean }) {
+function QuestionBlock({
+  question,
+  labels,
+  showAnswers,
+  look,
+  card,
+}: {
+  question: Question;
+  labels: SheetLabels;
+  showAnswers: boolean;
+  look: PdfLook;
+  card: boolean;
+}) {
+  // A drawing that goes with the question, shown under its prompt.
+  const visual = question.visual && <VisualPdf visual={question.visual} big={look.big} maxWidth={card ? 215 : 470} />;
   switch (question.type) {
     case "multiple-choice":
       return (
         <View>
           <WithBlanks value={question.prompt} />
+          {visual}
           <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 3 }}>
             {question.choices.map((choice, j) => {
               const correct = showAnswers && j === question.answerIndex;
@@ -456,25 +539,40 @@ function QuestionBlock({ question, labels, showAnswers }: { question: Question; 
               );
             })}
           </View>
+          {visual}
           {showAnswers && <Text style={s.answer}>{question.explanation}</Text>}
         </View>
       );
 
     case "fill-in-the-blank":
-      return <WithBlanks value={question.prompt} answers={showAnswers ? question.answers : undefined} />;
+      return (
+        <View>
+          {visual}
+          {look.boxes ? (
+            <BoxedBlanks value={question.prompt} answers={showAnswers ? question.answers : undefined} />
+          ) : (
+            <WithBlanks value={question.prompt} answers={showAnswers ? question.answers : undefined} />
+          )}
+        </View>
+      );
 
     case "matching": {
       const { right, letterFor } = matchingOrder(question.pairs);
       return (
         <View>
           <Text>{question.prompt}</Text>
+          {visual}
           <View style={{ flexDirection: "row", marginTop: 4 }}>
             <View style={{ flex: 1, paddingRight: 10 }}>
               {question.pairs.map((pair, i) => (
-                <View key={i} style={{ flexDirection: "row", marginBottom: 4 }}>
+                <View key={i} style={{ flexDirection: "row", alignItems: "center", marginBottom: 4 }}>
                   <Text style={{ width: 24, borderBottomWidth: 0.8, borderBottomColor: "#a49cc4", textAlign: "center", marginRight: 6, color: violet, fontFamily: display, fontWeight: 700 }}>
                     {showAnswers ? letterFor(pair.match) : " "}
                   </Text>
+                  {pair.picture && (
+                    // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf images have no alt text
+                    <Image src={pictureFile(pair.picture)} style={{ width: look.big ? 28 : 20, height: look.big ? 28 : 20, marginRight: 5 }} />
+                  )}
                   <Text style={{ flex: 1 }}>{pair.term}</Text>
                 </View>
               ))}
@@ -497,10 +595,11 @@ function QuestionBlock({ question, labels, showAnswers }: { question: Question; 
       return (
         <View>
           <Text>{question.prompt}</Text>
+          {visual}
           {showAnswers ? (
             <Text style={s.answer}>{question.answer}</Text>
           ) : (
-            Array.from({ length: question.lines }, (_, i) => <View key={i} style={s.writeLine} />)
+            Array.from({ length: question.lines }, (_, i) => <WriteLine key={i} look={look} />)
           )}
         </View>
       );
@@ -509,6 +608,7 @@ function QuestionBlock({ question, labels, showAnswers }: { question: Question; 
       return (
         <View>
           <Text>{question.prompt}</Text>
+          {visual}
           {showAnswers ? (
             <View style={s.answer}>
               {question.solution.map((step, i) => (
@@ -522,7 +622,7 @@ function QuestionBlock({ question, labels, showAnswers }: { question: Question; 
             </View>
           ) : (
             <>
-              <GraphPaper />
+              <GraphPaper width={card ? 210 : 470} height={look.work} />
               <View style={{ flexDirection: "row", alignItems: "flex-end", marginTop: 4 }}>
                 <Text style={{ fontSize: 9.5 }}>{labels.answer}: </Text>
                 <View style={{ width: 160, borderBottomWidth: 0.8, borderBottomColor: "#a49cc4", height: 12 }} />
@@ -535,9 +635,7 @@ function QuestionBlock({ question, labels, showAnswers }: { question: Question; 
 }
 
 // Working space for math, as light graph paper.
-function GraphPaper() {
-  const width = 470;
-  const height = 96;
+function GraphPaper({ width, height }: { width: number; height: number }) {
   const step = 12;
   return (
     <Svg width={width} height={height} style={{ marginTop: 4 }}>
@@ -549,6 +647,125 @@ function GraphPaper() {
       ))}
     </Svg>
   );
+}
+
+// A line to write on. Young students get handwriting lines: a light top line,
+// a dashed middle line and a darker base line.
+function WriteLine({ look }: { look: PdfLook }) {
+  if (!look.handwriting) return <View style={[s.writeLine, { height: look.line }]} />;
+  const w = 470;
+  return (
+    <Svg width={w} height={look.line} style={{ marginTop: 2 }}>
+      <Line x1={0} y1={2} x2={w} y2={2} stroke="#c9c2e0" strokeWidth={0.7} />
+      <Line x1={0} y1={look.line / 2 + 1} x2={w} y2={look.line / 2 + 1} stroke="#b9b0d6" strokeWidth={0.7} strokeDasharray="4 3" />
+      <Line x1={0} y1={look.line - 1} x2={w} y2={look.line - 1} stroke="#6f6798" strokeWidth={1.2} />
+    </Svg>
+  );
+}
+
+// Fill-in-the-blank with boxes to write in, for Grades 1 and 2.
+function BoxedBlanks({ value, answers }: { value: string; answers?: string[] }) {
+  const parts = splitBlanks(value);
+  return (
+    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center" }}>
+      {parts.map((part, i) => (
+        <View key={i} style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center" }}>
+          {part
+            .split(/\s+/)
+            .filter(Boolean)
+            .map((word, j) => (
+              <Text key={j} style={{ marginRight: 4 }}>
+                {word}
+              </Text>
+            ))}
+          {i < parts.length - 1 && (
+            <View style={{ minWidth: 44, height: 30, borderWidth: 1.5, borderColor: "#6f6798", borderRadius: 5, marginRight: 4, marginVertical: 2, justifyContent: "center", alignItems: "center", paddingHorizontal: 4 }}>
+              {answers && <Text style={{ color: violet, fontFamily: display, fontWeight: 700 }}>{answers[i]}</Text>}
+            </View>
+          )}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+// A worksheet drawing in the PDF, from the same shapes as the web version.
+function VisualPdf({ visual, big = false, maxWidth = 470 }: { visual: Visual; big?: boolean; maxWidth?: number }) {
+  if (visual.kind === "pictures") {
+    const size = big ? 24 : 18;
+    return (
+      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginVertical: 5 }} wrap={false}>
+        {visual.groups.map((group, i) => (
+          <View key={i} style={{ flexDirection: "row", alignItems: "center" }}>
+            {i > 0 && visual.operator && (
+              <Text style={{ fontFamily: display, fontWeight: 700, fontSize: 20, color: ink, marginHorizontal: 6 }}>
+                {visual.operator === "-" ? "−" : "+"}
+              </Text>
+            )}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", maxWidth: Math.min(200, maxWidth - 30), borderWidth: 1.2, borderStyle: "dashed", borderColor: lilac, borderRadius: 8, padding: 4 }}>
+              {Array.from({ length: group.count }, (_, j) => (
+                // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf images have no alt text
+                <Image key={j} src={pictureFile(group.picture)} style={{ width: size, height: size, margin: 1.5 }} />
+              ))}
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  }
+  if (visual.kind === "picture-cards") {
+    return (
+      <View style={{ flexDirection: "row", flexWrap: "wrap", marginVertical: 5 }} wrap={false}>
+        {visual.cards.map((card, i) => (
+          <View key={i} style={{ width: 76, alignItems: "center", borderWidth: 1.2, borderColor: line, borderRadius: 8, padding: 5, marginRight: 6, marginBottom: 6 }}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf images have no alt text */}
+            <Image src={pictureFile(card.picture)} style={{ width: 36, height: 36 }} />
+            {card.label ? (
+              <Text style={{ fontSize: 9, textAlign: "center", marginTop: 3, color: ink }}>{card.label}</Text>
+            ) : (
+              <View style={{ width: 60, borderBottomWidth: 0.8, borderBottomColor: "#6f6798", height: 16 }} />
+            )}
+          </View>
+        ))}
+      </View>
+    );
+  }
+  const drawing = drawVisual(visual);
+  // Scale to fit the page width, and a little larger for young students.
+  const scale = Math.min(big ? 0.95 : 0.8, maxWidth / drawing.width);
+  return (
+    <View style={{ marginVertical: 5 }} wrap={false}>
+      <Svg width={drawing.width * scale} height={drawing.height * scale} viewBox={`0 0 ${drawing.width} ${drawing.height}`}>
+        {drawing.prims.map((p, i) => (
+          <PrimPdf key={i} p={p} />
+        ))}
+      </Svg>
+    </View>
+  );
+}
+
+// Inside an Svg, react-pdf's Image takes x and y, which its types leave out.
+const SvgImage = Image as unknown as ComponentType<{ src: string; x: number; y: number; style: { width: number; height: number } }>;
+
+function PrimPdf({ p }: { p: Prim }) {
+  switch (p.t) {
+    case "rect":
+      return <Rect x={p.x} y={p.y} width={p.w} height={p.h} rx={p.rx} fill={p.fill ?? "none"} stroke={p.stroke} strokeWidth={p.sw} />;
+    case "circle":
+      return <Circle cx={p.cx} cy={p.cy} r={p.r} fill={p.fill ?? "none"} stroke={p.stroke} strokeWidth={p.sw} />;
+    case "line":
+      return <Line x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2} stroke={p.stroke} strokeWidth={p.sw} strokeDasharray={p.dash} strokeLinecap="round" />;
+    case "path":
+      return <Path d={p.d} fill={p.fill ?? "none"} stroke={p.stroke} strokeWidth={p.sw} />;
+    case "text":
+      return (
+        <SvgText x={p.x} y={p.y} fill={p.fill} textAnchor={p.anchor} style={{ fontSize: p.size, fontFamily: p.bold ? "Fraunces" : "Sniglet", fontWeight: p.bold ? 700 : 400 }}>
+          {p.text}
+        </SvgText>
+      );
+    case "image":
+      return <SvgImage src={pictureFile(p.picture)} x={p.x} y={p.y} style={{ width: p.w, height: p.h }} />;
+  }
 }
 
 // "grade-5-core-french-les-verbes-etre-et-avoir-quiz.pdf"

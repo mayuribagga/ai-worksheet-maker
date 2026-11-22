@@ -29,6 +29,18 @@ export function SiteFooter() {
           ))}
         </nav>
       </div>
+      {/* Credit for the worksheet pictures, which their licence requires. */}
+      <p className="mx-auto w-full max-w-6xl px-5 pb-6 text-xs text-muted sm:px-6">
+        Worksheet pictures:{" "}
+        <a href="https://github.com/jdecked/twemoji" className="underline hover:text-ink">
+          Twemoji
+        </a>{" "}
+        by X Corp and contributors,{" "}
+        <a href="https://creativecommons.org/licenses/by/4.0/" className="underline hover:text-ink">
+          CC BY 4.0
+        </a>
+        .
+      </p>
     </footer>
   );
 }
